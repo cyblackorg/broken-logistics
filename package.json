@@ -1,0 +1,74 @@
+{
+  "name": "broken-logistics",
+  "version": "1.0.0",
+  "description": "An intentionally vulnerable logistics application for security education",
+  "keywords": ["security", "education", "logistics", "vulnerable", "owasp"],
+  "author": "BrokenLogistics Team",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d && echo '\n🚀 BrokenLogistics is starting...\n📱 Frontend: http://localhost:3000\n🔧 Backend API: http://localhost:5000\n🗄️  Database: localhost:5432\n🔍 pgAdmin: http://localhost:8080\n'",
+    "dev:logs": "docker-compose logs -f",
+    "dev:stop": "docker-compose down",
+    "dev:restart": "docker-compose down && docker-compose up -d",
+    "dev:clean": "docker-compose down -v && docker system prune -f",
+    "setup": "npm install && npm run setup:frontend && npm run setup:backend",
+    "setup:frontend": "cd frontend && npm install",
+    "setup:backend": "cd backend && npm install",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:fix": "npm run lint:fix:frontend && npm run lint:fix:backend",
+    "lint:fix:frontend": "cd frontend && npm run lint:fix",
+    "lint:fix:backend": "cd backend && npm run lint:fix",
+    "seed": "cd backend && npm run seed",
+    "db:reset": "docker-compose stop db && docker-compose rm -f db && docker-compose up -d db",
+    "security:scan": "npm audit && cd frontend && npm audit && cd ../backend && npm audit",
+    "docs:api": "cd backend && npm run docs:generate",
+    "vulnerability:demo": "echo '\n🔥 Starting vulnerability demonstrations...\n' && npm run dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "prettier": "^3.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{md,json}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/broken-logistics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/broken-logistics/issues"
+  },
+  "homepage": "https://github.com/your-org/broken-logistics#readme"
+} 

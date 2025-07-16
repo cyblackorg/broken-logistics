@@ -1,0 +1,14 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Location pin -->
+  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Pin center -->
+  <circle cx="12" cy="10" r="3" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Route/path indicators -->
+  <circle cx="6" cy="6" r="2" fill="#0891B2"/>
+  <circle cx="18" cy="14" r="2" fill="#16A34A"/>
+  
+  <!-- Connecting line -->
+  <path d="M8 6 Q12 2 18 14" stroke="#6B7280" stroke-width="1" stroke-dasharray="2,2" fill="none"/>
+</svg> 

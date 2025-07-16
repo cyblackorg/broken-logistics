@@ -1,0 +1,11 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield outline -->
+  <path d="M12 2 L4 6 L4 12 C4 16.5 7.5 20.26 12 22 C16.5 20.26 20 16.5 20 12 L20 6 L12 2 Z" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Security gap/vulnerability (broken part) -->
+  <path d="M8 12 L10 14 L14 10" stroke="#EA580C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Warning indicator -->
+  <circle cx="16" cy="8" r="2" fill="#EA580C"/>
+  <circle cx="16" cy="8" r="0.5" fill="#FFFFFF"/>
+</svg> 

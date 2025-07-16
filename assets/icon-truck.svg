@@ -1,0 +1,19 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Truck cab -->
+  <rect x="2" y="7" width="8" height="8" rx="1" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Truck bed -->
+  <rect x="10" y="7" width="10" height="8" rx="1" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Front wheel -->
+  <circle cx="6" cy="18" r="2" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Rear wheel -->
+  <circle cx="16" cy="18" r="2" stroke="#1F2937" stroke-width="2" fill="none"/>
+  
+  <!-- Truck details -->
+  <rect x="3" y="8" width="2" height="2" fill="#1F2937"/>
+  <line x1="12" y1="9" x2="18" y2="9" stroke="#1F2937" stroke-width="1"/>
+  <line x1="12" y1="11" x2="18" y2="11" stroke="#1F2937" stroke-width="1"/>
+  <line x1="12" y1="13" x2="18" y2="13" stroke="#1F2937" stroke-width="1"/>
+</svg> 
