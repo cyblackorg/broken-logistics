@@ -1,5 +1,6 @@
 import express from 'express';
-import { sequelize } from '../config/database';
+import jwt from 'jsonwebtoken';
+import { sequelize, QueryTypes } from '../config/database';
 import { logger, logSQLInjectionAttempt } from '../utils/logger';
 
 const router = express.Router();
@@ -47,7 +48,7 @@ router.get('/', async (req: any, res: any) => {
     });
 
     const packages = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     res.json({
@@ -99,7 +100,7 @@ router.get('/:id', async (req: any, res: any) => {
     });
 
     const packages = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     if (packages.length === 0) {
@@ -118,7 +119,7 @@ router.get('/:id', async (req: any, res: any) => {
     // Fetch package events (vulnerable query)
     const eventsQuery = `SELECT * FROM package_events WHERE package_id = ${id} ORDER BY timestamp`;
     const events = await sequelize.query(eventsQuery, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     res.json({
@@ -183,7 +184,7 @@ router.post('/', async (req: any, res: any) => {
     });
 
     const result = await sequelize.query(insertQuery, {
-      type: sequelize.QueryTypes.INSERT
+      type: QueryTypes.INSERT
     });
 
     const newPackage = (result[0] as any)[0];
@@ -248,7 +249,7 @@ router.put('/:id', async (req: any, res: any) => {
     });
 
     const result = await sequelize.query(updateQuery, {
-      type: sequelize.QueryTypes.UPDATE
+      type: QueryTypes.UPDATE
     });
 
     res.json({
@@ -292,12 +293,12 @@ router.delete('/:id', async (req: any, res: any) => {
     });
 
     const result = await sequelize.query(deleteQuery, {
-      type: sequelize.QueryTypes.DELETE
+      type: QueryTypes.DELETE
     });
 
     res.json({
       message: 'Package deleted successfully',
-      affected_rows: result[1],
+      affected_rows: (result as any)[1],
       debug: {
         query: deleteQuery,
         warning: 'No authorization check - anyone can delete packages!'
@@ -340,7 +341,7 @@ router.get('/bulk-export', async (req: any, res: any) => {
     });
 
     const packages = await sequelize.query(exportQuery, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     res.json({

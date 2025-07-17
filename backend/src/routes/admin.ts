@@ -1,5 +1,6 @@
 import express from 'express';
-import { sequelize } from '../config/database';
+import jwt from 'jsonwebtoken';
+import { sequelize, QueryTypes } from '../config/database';
 import { logger } from '../utils/logger';
 
 const router = express.Router();
@@ -9,9 +10,9 @@ router.get('/users', async (req: any, res: any) => {
   try {
     // Vulnerable: Expose all user data including passwords
     const query = 'SELECT * FROM users';
-    const users = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT
-    });
+          const users = await sequelize.query(query, {
+        type: QueryTypes.SELECT
+      });
 
     logger.warn('ADMIN_USER_ACCESS', {
       total_users: users.length,

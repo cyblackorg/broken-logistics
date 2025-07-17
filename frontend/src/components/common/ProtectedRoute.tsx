@@ -3,10 +3,10 @@ import { useAuth } from '../../context/AuthContext';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: string;
+  allowedRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { user, isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
@@ -18,11 +18,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     );
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  // Vulnerable: Role check can be bypassed (intentional vulnerability)
+  if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-bold text-red-600">Insufficient Permissions</h2>
-        <p className="mt-2">You don't have the required role to access this page.</p>
+        <p className="mt-2">Your role: {user.role}</p>
+        <p className="text-sm text-gray-500">Required: {allowedRoles.join(', ')}</p>
       </div>
     );
   }

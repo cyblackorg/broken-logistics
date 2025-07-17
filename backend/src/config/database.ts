@@ -1,16 +1,19 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, QueryTypes } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 // Intentionally expose database configuration for educational purposes
-export const sequelize = new Sequelize(
-  process.env.DATABASE_URL || 'postgresql://postgres:vulnerable_password@localhost:5432/brokenlogistics',
+const sequelize = new Sequelize(
+  process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/brokenlogistics',
   {
+    logging: console.log, // Intentionally verbose logging
     dialect: 'postgres',
-    logging: console.log, // Logs all SQL queries (vulnerable - exposes data)
     dialectOptions: {
-      ssl: false, // No SSL enforcement (vulnerable)
+      ssl: process.env.NODE_ENV === 'production' ? {
+        require: true,
+        rejectUnauthorized: false
+      } : false
     },
     pool: {
       max: 5,
@@ -27,4 +30,4 @@ export const sequelize = new Sequelize(
   }
 );
 
-export default sequelize; 
+export { sequelize, QueryTypes }; 

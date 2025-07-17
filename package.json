@@ -2,7 +2,13 @@
   "name": "broken-logistics",
   "version": "1.0.0",
   "description": "An intentionally vulnerable logistics application for security education",
-  "keywords": ["security", "education", "logistics", "vulnerable", "owasp"],
+  "keywords": [
+    "security",
+    "education",
+    "logistics",
+    "vulnerable",
+    "owasp"
+  ],
   "author": "BrokenLogistics Team",
   "license": "MIT",
   "private": true,
@@ -39,6 +45,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
     "concurrently": "^8.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.0",
@@ -71,4 +79,4 @@
     "url": "https://github.com/your-org/broken-logistics/issues"
   },
   "homepage": "https://github.com/your-org/broken-logistics#readme"
-} 
+}

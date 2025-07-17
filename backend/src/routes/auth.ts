@@ -1,7 +1,7 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { sequelize } from '../config/database';
+import jwt from 'jsonwebtoken';
+import { sequelize, QueryTypes } from '../config/database';
 import { logger, logSensitiveOperation } from '../utils/logger';
 
 const router = express.Router();
@@ -47,9 +47,9 @@ router.post('/register', async (req, res) => {
     // Vulnerable: No input validation
     // Vulnerable: SQL injection possible
     const checkUserQuery = `SELECT * FROM users WHERE email = '${email}'`;
-    const existingUsers = await sequelize.query(checkUserQuery, {
-      type: sequelize.QueryTypes.SELECT
-    });
+          const existingUsers = await sequelize.query(checkUserQuery, {
+        type: QueryTypes.SELECT
+      });
 
     if (existingUsers.length > 0) {
       return res.status(400).json({
@@ -69,9 +69,9 @@ router.post('/register', async (req, res) => {
       RETURNING *
     `;
 
-    const newUsers = await sequelize.query(insertUserQuery, {
-      type: sequelize.QueryTypes.INSERT
-    });
+          const newUsers = await sequelize.query(insertUserQuery, {
+        type: QueryTypes.INSERT
+      });
 
     const user = (newUsers[0] as any)[0];
 
@@ -118,13 +118,14 @@ router.post('/register', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Registration error:', error);
     res.status(500).json({
       error: 'Registration failed',
       details: error.message,
       stack: error.stack // Vulnerable: Expose stack trace
     });
+    return;
   }
 });
 
@@ -155,9 +156,9 @@ router.post('/login', async (req, res) => {
 
     logger.info('LOGIN_QUERY', { query: loginQuery });
 
-    const users = await sequelize.query(loginQuery, {
-      type: sequelize.QueryTypes.SELECT
-    });
+          const users = await sequelize.query(loginQuery, {
+        type: QueryTypes.SELECT
+      });
 
     if (users.length === 0) {
       // Vulnerable: Detailed error message reveals system information
@@ -230,7 +231,7 @@ router.post('/login', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Login error:', error);
     res.status(500).json({
       error: 'Login failed',
@@ -290,7 +291,7 @@ router.get('/profile', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     res.status(401).json({
       error: 'Invalid token',
       details: error.message,
@@ -319,9 +320,9 @@ router.post('/reset', async (req, res) => {
       WHERE email = '${email}'
     `;
 
-    const result = await sequelize.query(resetQuery, {
-      type: sequelize.QueryTypes.UPDATE
-    });
+          const result = await sequelize.query(resetQuery, {
+        type: QueryTypes.UPDATE
+      });
 
     logger.warn('PASSWORD_RESET', {
       email: email,
@@ -339,7 +340,7 @@ router.post('/reset', async (req, res) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       error: 'Password reset failed',
       details: error.message,

@@ -1,5 +1,6 @@
 import express from 'express';
-import { sequelize } from '../config/database';
+import jwt from 'jsonwebtoken';
+import { sequelize, QueryTypes } from '../config/database';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get('/:id', async (req: any, res: any) => {
     // Vulnerable: IDOR - any user can access any user's data
     const query = `SELECT * FROM users WHERE id = ${id}`;
     const users = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     if (users.length === 0) {

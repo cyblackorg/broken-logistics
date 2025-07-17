@@ -1,5 +1,5 @@
 import express from 'express';
-import { sequelize } from '../config/database';
+import { sequelize, QueryTypes } from '../config/database';
 import { logger } from '../utils/logger';
 
 const router = express.Router();
@@ -33,7 +33,7 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
     });
 
     const packages = await sequelize.query(trackingQuery, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     if (packages.length === 0) {
@@ -52,7 +52,7 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
     // Get events (vulnerable query)
     const eventsQuery = `SELECT * FROM package_events WHERE package_id = ${(packageData as any).id}`;
     const events = await sequelize.query(eventsQuery, {
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     res.json({
