@@ -49,8 +49,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       });
 
-      if (response.data.success) {
-        const { user: userData, token } = response.data;
+      // Backend returns { message, user, token, debug } instead of { success, user, token }
+      if (response.data.message === "Login successful" && response.data.user && response.data.token) {
+        const { user: backendUser, token } = response.data;
+        
+        // Transform backend user format to frontend format
+        const userData = {
+          ...backendUser,
+          name: `${backendUser.firstName} ${backendUser.lastName}` // Combine first and last name
+        };
         
         // Store user data
         setUser(userData);

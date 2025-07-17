@@ -19,12 +19,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   }
 
   // Vulnerable: Role check can be bypassed (intentional vulnerability)
-  if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && user?.role && !allowedRoles.includes(user.role.toLowerCase())) {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-bold text-red-600">Insufficient Permissions</h2>
         <p className="mt-2">Your role: {user.role}</p>
         <p className="text-sm text-gray-500">Required: {allowedRoles.join(', ')}</p>
+        <p className="text-xs text-gray-400 mt-2">🔓 Tip: Try changing the URL or tampering with localStorage!</p>
       </div>
     );
   }

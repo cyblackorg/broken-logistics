@@ -19,15 +19,27 @@ const LockIcon = () => (
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login, isAuthenticated, loading, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated based on user role
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/customer');
+    if (isAuthenticated && user) {
+      const role = user.role.toLowerCase();
+      switch (role) {
+        case 'admin':
+          navigate('/admin');
+          break;
+        case 'driver':
+          navigate('/driver');
+          break;
+        case 'customer':
+        default:
+          navigate('/customer');
+          break;
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
