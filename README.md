@@ -8,6 +8,10 @@ BrokenLogistics is a full-stack web application that simulates a real-world logi
 
 **⚠️ SECURITY WARNING: This application contains intentional security vulnerabilities. Never deploy this in a production environment or on public networks without proper isolation.**
 
+## ⚡ Quick Start
+
+**TL;DR:** Clone the repo, run `docker-compose up --build`, then visit http://localhost:3000
+
 ## 🎯 Educational Objectives
 
 This application helps students and security professionals learn about:
@@ -32,31 +36,94 @@ This application helps students and security professionals learn about:
 - **👔 Administrators**: Oversee operations and users
 - **🎓 Students**: Learn about vulnerabilities
 
-## 🚀 Quick Start
+## 🚀 How to Run
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+ (for local development)
-- Git
+- **Docker** and **Docker Compose** (recommended)
+- **Node.js 18+** (for local development only)
+- **Git**
 
-### 1. Clone Repository
+### Option 1: Docker Compose (Recommended)
+
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
 cd broken-logistics
 ```
 
-### 2. Start Development Environment
+2. **Start all services with Docker Compose:**
+```bash
+docker-compose up --build
+```
+
+3. **Access the application:**
+- 🌐 **Frontend**: http://localhost:3000
+- 🔧 **Backend API**: http://localhost:5000
+- 🗄️ **Database**: localhost:5432
+- 📊 **pgAdmin**: http://localhost:8080
+
+4. **Stop all services:**
+```bash
+docker-compose down
+```
+
+### Option 2: Local Development
+
+1. **Install dependencies:**
+```bash
+npm install
+```
+
+2. **Start development environment:**
 ```bash
 npm run dev
 ```
 
-This will start all services:
-- 📱 **Frontend**: http://localhost:3000
-- 🔧 **Backend API**: http://localhost:5000
-- 🗄️ **Database**: localhost:5432
-- 🔍 **pgAdmin**: http://localhost:8080
+### Option 3: Individual Services
 
-### 3. Default Login Credentials
+**Start only the database:**
+```bash
+docker-compose up db -d
+```
+
+**Run backend locally:**
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+**Run frontend locally:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Useful Docker Commands
+
+**View running containers:**
+```bash
+docker-compose ps
+```
+
+**View logs:**
+```bash
+docker-compose logs -f [service-name]
+```
+
+**Rebuild specific service:**
+```bash
+docker-compose up --build [service-name]
+```
+
+**Reset everything (remove volumes):**
+```bash
+docker-compose down -v
+docker-compose up --build
+```
+
+### Default Login Credentials
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@brokenlogistics.com | admin123 |
