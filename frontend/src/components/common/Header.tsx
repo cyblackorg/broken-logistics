@@ -98,13 +98,8 @@ const Header: React.FC = () => {
               <div className="text-xl font-bold text-white">
                 BrokenLogistics
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="bg-red-500 px-2 py-0.5 rounded text-xs font-medium text-white">
-                  VULNERABLE
-                </div>
-                <div className="text-xs text-blue-200">
-                  Enterprise Platform
-                </div>
+              <div className="text-xs text-blue-200">
+                Enterprise Platform
               </div>
             </div>
           </Link>
@@ -186,26 +181,7 @@ const Header: React.FC = () => {
           </button>
         </div>
 
-        {/* System Info */}
-        <div className="pb-3 border-t border-blue-500 mt-3">
-          <div className="flex items-center justify-between text-xs">
-            <div className="text-blue-200">
-              Global logistics network • Real-time tracking • Secure delivery
-            </div>
-            <div className="flex items-center space-x-4 text-blue-300">
-              <span className="flex items-center space-x-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                <span>API Online</span>
-              </span>
-              <span className="hidden md:block">
-                {isAuthenticated ? `Session: ${user?.id}` : 'Public Access'}
-              </span>
-              <span className="hidden md:block bg-orange-500 bg-opacity-20 px-2 py-1 rounded text-orange-300 font-medium">
-                🔥 Debug Mode
-              </span>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* Mobile Menu */}

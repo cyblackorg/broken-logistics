@@ -22,7 +22,6 @@ interface UserFormData {
   last_name: string;
   phone: string;
   role: string;
-  customer_type: string;
   is_active: boolean;
 }
 
@@ -43,7 +42,6 @@ const UserManagement: React.FC = () => {
     last_name: '',
     phone: '',
     role: 'customer',
-    customer_type: 'individual',
     is_active: true
   });
 
@@ -147,7 +145,6 @@ const UserManagement: React.FC = () => {
       last_name: '',
       phone: '',
       role: 'customer',
-      customer_type: 'individual',
       is_active: true
     });
     setSelectedUser(null);
@@ -162,7 +159,6 @@ const UserManagement: React.FC = () => {
       last_name: user.last_name || '',
       phone: user.phone || '',
       role: user.role,
-      customer_type: user.customer_type,
       is_active: user.is_active
     });
     setShowEditModal(true);
@@ -421,30 +417,8 @@ const UserManagement: React.FC = () => {
                     <option value="customer_service">Customer Service</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Customer Type</label>
-                  <select
-                    value={formData.customer_type}
-                    onChange={(e) => setFormData({...formData, customer_type: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="individual">Individual</option>
-                    <option value="business">Business</option>
-                  </select>
-                </div>
               </div>
               
-              {formData.customer_type === 'business' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                  <input
-                    type="text"
-                    value={formData.company_name}
-                    onChange={(e) => setFormData({...formData, company_name: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-              )}
               
               <div className="flex items-center">
                 <input
@@ -548,30 +522,8 @@ const UserManagement: React.FC = () => {
                     <option value="customer_service">Customer Service</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Customer Type</label>
-                  <select
-                    value={formData.customer_type}
-                    onChange={(e) => setFormData({...formData, customer_type: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="individual">Individual</option>
-                    <option value="business">Business</option>
-                  </select>
-                </div>
               </div>
               
-              {formData.customer_type === 'business' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                  <input
-                    type="text"
-                    value={formData.company_name}
-                    onChange={(e) => setFormData({...formData, company_name: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-              )}
               
               <div className="flex items-center">
                 <input

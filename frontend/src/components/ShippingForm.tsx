@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import PaymentForm from './PaymentForm';
+import SavedCards from './SavedCards';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -44,6 +46,26 @@ const ShippingForm: React.FC = () => {
   const [speedOptions, setSpeedOptions] = useState<SpeedOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [savedCards, setSavedCards] = useState([
+    {
+      id: 'card1',
+      last4: '1234',
+      brand: 'Visa',
+      expiry: '12/25',
+      name: 'John Doe',
+      isDefault: true
+    },
+    {
+      id: 'card2', 
+      last4: '5678',
+      brand: 'Mastercard',
+      expiry: '03/26',
+      name: 'John Doe',
+      isDefault: false
+    }
+  ]);
 
   // Form data with pre-filled sender info
   const [formData, setFormData] = useState({
@@ -118,17 +140,33 @@ const ShippingForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!quote) {
+      toast.error('Please calculate shipping cost first');
+      return;
+    }
+
+    // Show payment form
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async (paymentId: string) => {
     setLoading(true);
+    setShowPayment(false);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/shipping/create`, formData);
+      const response = await axios.post(`${API_BASE_URL}/shipping/create`, {
+        ...formData,
+        paymentId,
+        selectedCard: selectedCard?.id
+      });
       
       toast.success('Shipment created successfully!');
       
       // Reset form
       setFormData({
-        senderName: '',
-        senderEmail: '',
+        senderName: user?.name || '',
+        senderEmail: user?.email || '',
         senderPhone: '',
         recipientName: '',
         recipientEmail: '',
@@ -143,6 +181,7 @@ const ShippingForm: React.FC = () => {
         deliveryInstructions: ''
       });
       setQuote(null);
+      setSelectedCard(null);
 
       // Show tracking number
       if (response.data.shipment?.trackingNumber) {
@@ -154,6 +193,24 @@ const ShippingForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCardSelect = (card: any) => {
+    setSelectedCard(card);
+  };
+
+  const handleDeleteCard = (cardId: string) => {
+    setSavedCards(prev => prev.filter(card => card.id !== cardId));
+    if (selectedCard?.id === cardId) {
+      setSelectedCard(null);
+    }
+  };
+
+  const handleSetDefaultCard = (cardId: string) => {
+    setSavedCards(prev => prev.map(card => ({
+      ...card,
+      isDefault: card.id === cardId
+    })));
   };
 
   return (
@@ -441,6 +498,25 @@ const ShippingForm: React.FC = () => {
           </div>
         )}
 
+        {/* Payment Section */}
+        {quote && (
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h3>
+            
+            {/* Saved Cards */}
+            <SavedCards
+              cards={savedCards}
+              onSelectCard={handleCardSelect}
+              onDeleteCard={handleDeleteCard}
+              onSetDefault={handleSetDefaultCard}
+            />
+            
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600 mb-2">Total to pay: <span className="font-bold text-lg text-blue-600">${quote.totalCost}</span></p>
+            </div>
+          </div>
+        )}
+
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
@@ -448,10 +524,19 @@ const ShippingForm: React.FC = () => {
             disabled={loading || !quote}
             className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Creating Shipment...' : 'Create Shipment'}
+            {loading ? 'Creating Shipment...' : 'Proceed to Payment'}
           </button>
         </div>
       </form>
+
+      {/* Payment Modal */}
+      {showPayment && quote && (
+        <PaymentForm
+          amount={quote.totalCost}
+          onPaymentSuccess={handlePaymentSuccess}
+          onCancel={() => setShowPayment(false)}
+        />
+      )}
     </div>
   );
 };

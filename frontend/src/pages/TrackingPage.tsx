@@ -78,7 +78,7 @@ const TrackingPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Track Your Package</h1>
-        
+
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <form onSubmit={handleSubmit} className="mb-6">
             <div className="flex flex-col sm:flex-row gap-4">

@@ -98,11 +98,11 @@ const HomePage: React.FC = () => {
       title: "Data Protection",
       description: "Your personal information is protected with industry-standard security measures."
     },
-    {
-      icon: <StarIcon />,
+          {
+        icon: <StarIcon />,
       title: "Premium Service",
       description: "Experience exceptional service with our dedicated logistics team."
-    }
+      }
   ];
 
   return (
