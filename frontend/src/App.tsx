@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CustomerPortal from './pages/CustomerPortal';
-
+import ProfilePage from './pages/ProfilePage';
 import AdminPortal from './pages/AdminPortal';
 import TrackingPage from './pages/TrackingPage';
 import ShippingPage from './pages/ShippingPage';
@@ -29,13 +29,17 @@ function App() {
               <Route path="/shipping" element={<ShippingPage />} />
               
               {/* Protected Routes */}
-              <Route path="/customer/*" element={
+                            <Route path="/customer/*" element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <CustomerPortal />
                 </ProtectedRoute>
               } />
               
-
+              <Route path="/profile" element={
+                <ProtectedRoute allowedRoles={['customer', 'admin']}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
               
               <Route path="/admin/*" element={
                 <ProtectedRoute allowedRoles={['admin']}>

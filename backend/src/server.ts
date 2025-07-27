@@ -17,6 +17,7 @@ import analyticsRoutes from './routes/analytics';
 
 import shippingRoutes from './routes/shipping';
 import chatbotRoutes from './routes/chatbot';
+import profileRoutes from './routes/profile';
 import { errorHandler } from './middleware/errorHandler';
 import { vulnerabilityLogger } from './middleware/vulnerabilityLogger';
 
@@ -84,6 +85,7 @@ app.use('/api/analytics', analyticsRoutes);
 
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Vulnerable debug endpoint (intentional)
 app.get('/debug', (req, res) => {

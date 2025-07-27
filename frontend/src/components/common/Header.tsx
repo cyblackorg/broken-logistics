@@ -141,6 +141,12 @@ const Header: React.FC = () => {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/profile"
+                  className="text-white hover:text-blue-200 font-medium transition-colors"
+                >
+                  Profile
+                </Link>
                 
                 {/* User Info */}
                 <div className="flex items-center space-x-3 bg-blue-700 rounded-lg px-3 py-2">
