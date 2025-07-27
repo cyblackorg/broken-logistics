@@ -35,7 +35,7 @@ router.get('/', async (req: any, res: any) => {
     const query = `
       SELECT 
         id, uuid, email, first_name, last_name, phone, role, 
-        customer_type, company_name, is_active, created_at, updated_at
+        is_active, created_at, updated_at
       FROM users 
       ${whereClause}
       ORDER BY created_at DESC
