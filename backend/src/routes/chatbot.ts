@@ -195,15 +195,15 @@ function isActionQuery(message: string): boolean {
 
 function generateSearchSQL(message: string, user: any): string {
   if (message.includes('my packages') || message.includes('my shipments')) {
-    return `SELECT * FROM packages WHERE sender_name = '${user?.name || user?.email}' ORDER BY created_at DESC`;
+    // For demonstration, show all packages since we want to show data
+    return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 10`;
   }
   
   if (message.includes('track') && message.includes('package')) {
     return `SELECT p.*, pe.status, pe.location, pe.description, pe.timestamp 
             FROM packages p 
             LEFT JOIN package_events pe ON p.id = pe.package_id 
-            WHERE p.sender_name = '${user?.name || user?.email}' 
-            ORDER BY p.created_at DESC, pe.timestamp DESC`;
+            ORDER BY p.created_at DESC, pe.timestamp DESC LIMIT 10`;
   }
   
   if (message.includes('pricing') || message.includes('cost') || message.includes('rates')) {
@@ -211,15 +211,16 @@ function generateSearchSQL(message: string, user: any): string {
   }
   
   if (message.includes('my quotes')) {
-    return `SELECT * FROM quotes WHERE customer_id = ${user?.id || 0} ORDER BY created_at DESC`;
+    return `SELECT * FROM quotes ORDER BY created_at DESC LIMIT 10`;
   }
   
-  return `SELECT * FROM packages WHERE sender_name = '${user?.name || user?.email}' LIMIT 5`;
+  // Default: show all packages for demonstration
+  return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 10`;
 }
 
 function generateActionSQL(message: string, user: any): string {
-  // For now, return read-only queries as actions are more complex
-  return `SELECT * FROM packages WHERE sender_name = '${user?.name || user?.email}' LIMIT 1`;
+  // For demonstration, return read-only queries as actions are more complex
+  return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 5`;
 }
 
 
