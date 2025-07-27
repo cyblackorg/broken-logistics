@@ -11,6 +11,7 @@ import CustomerPortal from './pages/CustomerPortal';
 import DriverPortal from './pages/DriverPortal';
 import AdminPortal from './pages/AdminPortal';
 import TrackingPage from './pages/TrackingPage';
+import ShippingPage from './pages/ShippingPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/track" element={<TrackingPage />} />
+              <Route path="/shipping" element={<ShippingPage />} />
               
               {/* Protected Routes */}
               <Route path="/customer/*" element={

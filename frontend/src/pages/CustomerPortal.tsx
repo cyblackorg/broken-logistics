@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import QuoteManager from '../components/QuoteManager';
+import { useAuth } from '../context/AuthContext';
 
-// Mock data for demonstration
-const mockUser = {
-  name: "John Customer",
-  email: "john@example.com",
-  id: "12345", // Exposed user ID - vulnerability
-  accountTier: "Premium",
-  balance: "$-423.18" // Negative balance exposed
-};
+// Mock user data enhanced with business customer features
+const createMockUser = (user: any) => ({
+  name: user?.name || "John Customer",
+  email: user?.email || "john@example.com",
+  id: user?.id || "12345",
+  accountTier: user?.customer_type === 'business' ? "Business Premium" : "Individual",
+  balance: user?.customer_type === 'business' ? "$15,432.18" : "$243.18",
+  customerType: user?.customer_type || 'individual',
+  companyName: (user as any)?.company_name || null
+});
 
 const mockPackages = [
   {
@@ -19,10 +23,7 @@ const mockPackages = [
     destination: "New York, NY",
     estimatedDelivery: "Today, 3:00 PM",
     progress: 75,
-    lastUpdate: "2 hours ago",
-    // Vulnerability: showing other users' packages
-    actualOwner: "user_456", 
-    isOwnPackage: false
+    lastUpdate: "2 hours ago"
   },
   {
     id: "BL456789",
@@ -32,9 +33,7 @@ const mockPackages = [
     destination: "Boston, MA",
     estimatedDelivery: "Delivered Dec 15",
     progress: 100,
-    lastUpdate: "3 days ago",
-    actualOwner: "user_123",
-    isOwnPackage: true
+    lastUpdate: "3 days ago"
   },
   {
     id: "BL123456",
@@ -44,10 +43,7 @@ const mockPackages = [
     destination: "Chicago, IL",
     estimatedDelivery: "Delayed",
     progress: 45,
-    lastUpdate: "1 day ago",
-    // Another user's package showing up
-    actualOwner: "user_789",
-    isOwnPackage: false
+    lastUpdate: "1 day ago"
   }
 ];
 
@@ -66,20 +62,25 @@ const mockActivity = [
   },
   {
     time: "1 day ago",
-    action: "Payment processed (insecurely stored)",
+    action: "Payment processed successfully",
     location: "System",
     icon: "💳"
   },
   {
     time: "2 days ago",
-    action: "Login from suspicious IP 192.168.1.1",
-    location: "Unknown Location",
-    icon: "🔓"
+    action: "Account login",
+    location: "Boston, MA",
+    icon: "🔐"
   }
 ];
 
 const CustomerPortal: React.FC = () => {
+  const { user } = useAuth();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [showQuoteManager, setShowQuoteManager] = useState(false);
+  
+  // Create mock user with business customer enhancements
+  const mockUser = createMockUser(user);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,16 +93,12 @@ const CustomerPortal: React.FC = () => {
                 Welcome back, {mockUser.name}!
               </h1>
               <p className="text-sm text-gray-500 mt-1">
-                Customer ID: {mockUser.id} • {mockUser.accountTier} Member
-                {/* Vulnerability indicator */}
-                <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                  🔓 Session Token: abc123def (totally secure!)
-                </span>
+                {mockUser.accountTier} Member • Account: {mockUser.id}
               </p>
             </div>
             <div className="mt-4 sm:mt-0 flex space-x-3">
               <Link
-                to="/ship"
+                to="/shipping"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Ship Package
@@ -117,7 +114,13 @@ const CustomerPortal: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Conditional Content */}
+      {showQuoteManager ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <QuoteManager />
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -130,8 +133,7 @@ const CustomerPortal: React.FC = () => {
               <div className="ml-4">
                 <h3 className="text-sm font-medium text-gray-500">Active Shipments</h3>
                 <p className="text-2xl font-bold text-gray-900">
-                  {mockPackages.filter(p => p.status !== 'Delivered').length + 47}
-                  <span className="text-xs text-gray-400 ml-1">(+ 47 others' packages)</span>
+                  {mockPackages.filter(p => p.status !== 'Delivered').length}
                 </p>
               </div>
             </div>
@@ -160,8 +162,8 @@ const CustomerPortal: React.FC = () => {
               </div>
               <div className="ml-4">
                 <h3 className="text-sm font-medium text-gray-500">Account Balance</h3>
-                <p className="text-2xl font-bold text-red-600">{mockUser.balance}</p>
-                <p className="text-xs text-gray-400">Credit limit: Unlimited (no verification!)</p>
+                <p className="text-2xl font-bold text-green-600">{mockUser.balance}</p>
+                <p className="text-xs text-gray-400">Available credit</p>
               </div>
             </div>
           </div>
@@ -169,14 +171,14 @@ const CustomerPortal: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                  <span className="text-red-600 font-semibold">🔐</span>
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <span className="text-purple-600 font-semibold">⭐</span>
                 </div>
               </div>
               <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Security Score</h3>
-                <p className="text-2xl font-bold text-red-600">F-</p>
-                <p className="text-xs text-green-600">Perfect score! 🎉</p>
+                <h3 className="text-sm font-medium text-gray-500">Customer Rating</h3>
+                <p className="text-2xl font-bold text-gray-900">4.8</p>
+                <p className="text-xs text-gray-400">Based on feedback</p>
               </div>
             </div>
           </div>
@@ -189,18 +191,13 @@ const CustomerPortal: React.FC = () => {
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Recent Packages
-                  <span className="ml-2 text-sm text-gray-500">
-                    (Including packages that may not be yours 😉)
-                  </span>
                 </h2>
               </div>
               <div className="divide-y divide-gray-200">
                 {mockPackages.map((pkg) => (
                   <div 
                     key={pkg.id}
-                    className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !pkg.isOwnPackage ? 'bg-red-50 border-l-4 border-l-red-400' : ''
-                    }`}
+                    className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => setSelectedPackage(selectedPackage === pkg.id ? null : pkg.id)}
                   >
                     <div className="flex items-center justify-between">
@@ -208,11 +205,6 @@ const CustomerPortal: React.FC = () => {
                         <div className="flex items-center space-x-3">
                           <h3 className="text-sm font-medium text-gray-900">
                             {pkg.id}
-                            {!pkg.isOwnPackage && (
-                              <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                                🚨 Not Your Package
-                              </span>
-                            )}
                           </h3>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${pkg.statusColor}`}>
                             {pkg.status}
@@ -252,9 +244,7 @@ const CustomerPortal: React.FC = () => {
                     {selectedPackage === pkg.id && (
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                         <p className="text-sm text-gray-600">
-                          <strong>Debug Info:</strong> Owner ID: {pkg.actualOwner} | 
-                          Package accessible via: /api/packages/{pkg.id} | 
-                          No auth required! 🎉
+                          <strong>Tracking Details:</strong> Package is currently in transit and will be delivered within the estimated time window.
                         </p>
                       </div>
                     )}
@@ -282,37 +272,46 @@ const CustomerPortal: React.FC = () => {
                 >
                   🔍 Track Packages
                 </Link>
+                <button 
+                  onClick={() => setShowQuoteManager(!showQuoteManager)}
+                  className="w-full flex items-center justify-center px-4 py-2 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100"
+                >
+                  💰 {showQuoteManager ? 'Hide Quotes' : 'Get Quote'}
+                  {mockUser.customerType === 'business' && (
+                    <span className="ml-1 text-xs">✨ Business Rates!</span>
+                  )}
+                </button>
                 <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                   📊 View Analytics
                 </button>
-                <button className="w-full flex items-center justify-center px-4 py-2 border border-yellow-300 rounded-md shadow-sm text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100">
-                  🚨 Access Admin Panel (Why not?)
+                <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                  ⚙️ Account Settings
                 </button>
               </div>
             </div>
 
-            {/* Account Security "Status" */}
+            {/* Account Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Dashboard</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Password Strength</span>
-                  <span className="text-sm text-red-600">Weak (Perfect!)</span>
+                  <span className="text-sm text-gray-600">Account Type</span>
+                  <span className="text-sm text-gray-900">{mockUser.accountTier}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">2FA Status</span>
-                  <span className="text-sm text-red-600">Disabled (Convenient!)</span>
+                  <span className="text-sm text-gray-600">Member Since</span>
+                  <span className="text-sm text-gray-900">March 2024</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Data Encryption</span>
-                  <span className="text-sm text-red-600">Plain Text (Fast!)</span>
+                  <span className="text-sm text-gray-600">Total Shipments</span>
+                  <span className="text-sm text-gray-900">47</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Privacy Level</span>
-                  <span className="text-sm text-red-600">Public (Transparent!)</span>
+                  <span className="text-sm text-gray-600">Customer ID</span>
+                  <span className="text-sm text-gray-900">{mockUser.id}</span>
                 </div>
-                <button className="w-full mt-3 px-4 py-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100">
-                  ✅ Everything looks secure!
+                <button className="w-full mt-3 px-4 py-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100">
+                  Update Profile
                 </button>
               </div>
             </div>
@@ -334,7 +333,8 @@ const CustomerPortal: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,9 +2,42 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 // Icons with fixed sizing
-const TruckIcon = () => (
-  <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+const BrokenLogisticsIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    {/* Background circle */}
+    <circle cx="16" cy="16" r="15" fill="#1e40af" stroke="#1e3a8a" strokeWidth="1"/>
+    
+    {/* Package/box icon */}
+    <g transform="translate(8, 8)">
+      {/* Main box */}
+      <rect x="2" y="6" width="12" height="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5"/>
+      
+      {/* Box lid */}
+      <path d="M2 6 L8 2 L14 6" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5"/>
+      
+      {/* Tape strips */}
+      <rect x="6" y="6" width="4" height="10" fill="#ef4444" opacity="0.8"/>
+      <rect x="2" y="8" width="12" height="2" fill="#ef4444" opacity="0.8"/>
+    </g>
+    
+    {/* Small delivery truck */}
+    <g transform="translate(18, 18)" opacity="0.9">
+      {/* Truck body */}
+      <rect x="0" y="2" width="8" height="4" fill="#10b981" stroke="#059669" strokeWidth="0.3"/>
+      
+      {/* Truck cabin */}
+      <rect x="6" y="3" width="3" height="3" fill="#10b981" stroke="#059669" strokeWidth="0.3"/>
+      
+      {/* Wheels */}
+      <circle cx="2" cy="6" r="1" fill="#374151"/>
+      <circle cx="6" cy="6" r="1" fill="#374151"/>
+    </g>
+    
+    {/* Broken chain link */}
+    <g transform="translate(22, 6)" opacity="0.7">
+      <path d="M0 2 Q1 0 2 2 Q3 4 2 6 Q1 8 0 6 Q-1 4 0 2" fill="none" stroke="#ef4444" strokeWidth="0.8" strokeLinecap="round"/>
+      <path d="M2 2 Q3 0 4 2 Q5 4 4 6 Q3 8 2 6 Q1 4 2 2" fill="none" stroke="#ef4444" strokeWidth="0.8" strokeLinecap="round"/>
+    </g>
   </svg>
 );
 
@@ -41,35 +74,35 @@ const StarIcon = () => (
 const HomePage: React.FC = () => {
   const features = [
     {
-      icon: <TruckIcon />,
+      icon: <BrokenLogisticsIcon />,
       title: "Real-Time Tracking",
-      description: "Track your packages with live GPS updates. We promise we only share your location data with trusted third parties... and maybe a few untrusted ones too."
+      description: "Track your packages with live GPS updates and real-time status notifications."
     },
     {
       icon: <ShieldIcon />,
-      title: "Military-Grade Security",
-      description: "Our security is so advanced, we use plain text passwords and store everything in public databases for maximum convenience!"
+      title: "Secure Shipping",
+      description: "Your packages are protected with comprehensive insurance and secure handling."
     },
     {
       icon: <ClockIcon />,
       title: "24/7 Support",
-      description: "Round-the-clock customer support. Our team will personally read your private messages to better assist you."
+      description: "Round-the-clock customer support to help with any shipping needs."
     },
     {
       icon: <GlobeIcon />,
       title: "Global Network",
-      description: "Worldwide delivery network with zero-day vulnerabilities reaching 200+ countries. Hackers welcome!"
+      description: "Worldwide delivery network reaching 200+ countries and territories."
     },
     {
       icon: <LockIcon />,
       title: "Data Protection",
-      description: "We take data protection seriously. That's why we made our admin panel accessible to everyone with a simple SQL injection!"
+      description: "Your personal information is protected with industry-standard security measures."
     },
-          {
-        icon: <StarIcon />,
-        title: "Zero-Day Delivery",
-        description: "We deliver your packages before you even know they exist! Our cutting-edge exploits ensure instant access to everyone's shipments."
-      }
+    {
+      icon: <StarIcon />,
+      title: "Premium Service",
+      description: "Experience exceptional service with our dedicated logistics team."
+    }
   ];
 
   return (
@@ -78,10 +111,16 @@ const HomePage: React.FC = () => {
       <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center max-w-4xl mx-auto">
+            <div className="mb-8 flex justify-center">
+              <div className="w-24 h-24 bg-white bg-opacity-10 rounded-full flex items-center justify-center p-4">
+                <BrokenLogisticsIcon />
+              </div>
+            </div>
+            
             <div className="mb-6">
-              <span className="inline-flex items-center space-x-2 bg-yellow-400 bg-opacity-20 border border-yellow-400 border-opacity-30 text-yellow-300 px-4 py-2 rounded-full text-sm font-medium">
+              <span className="inline-flex items-center space-x-2 bg-blue-400 bg-opacity-20 border border-blue-400 border-opacity-30 text-blue-300 px-4 py-2 rounded-full text-sm font-medium">
                 <ShieldIcon width="16" height="16" />
-                <span>100% Secure* (*Security not guaranteed)</span>
+                <span>Trusted by 10,000+ businesses</span>
               </span>
             </div>
             
@@ -90,8 +129,8 @@ const HomePage: React.FC = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-white text-opacity-90 mb-8 max-w-3xl mx-auto leading-relaxed">
-              The world's most innovative logistics platform. We've revolutionized security by 
-              removing all those pesky authentication barriers that slow down business!
+              The world's most reliable logistics platform. We deliver your packages safely and on time, 
+              every time, with our advanced tracking and delivery network.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -99,13 +138,13 @@ const HomePage: React.FC = () => {
                 to="/register" 
                 className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-semibold px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
               >
-                Join Our Leaky Network
+                Get Started Today
               </Link>
               <Link 
                 to="/track" 
                 className="bg-white bg-opacity-10 hover:bg-opacity-20 text-white font-semibold border border-white border-opacity-20 px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
               >
-                Track Anything (Even Others' Packages!)
+                Track Your Package
               </Link>
             </div>
 
@@ -113,95 +152,19 @@ const HomePage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">200+</div>
-                <div className="text-blue-200 text-sm">Countries Compromised</div>
+                <div className="text-blue-200 text-sm">Countries Served</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">10M+</div>
-                <div className="text-blue-200 text-sm">Data Breaches</div>
+                <div className="text-blue-200 text-sm">Packages Delivered</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">99.9%</div>
-                <div className="text-blue-200 text-sm">Vulnerability Rate</div>
+                <div className="text-blue-200 text-sm">On-Time Delivery</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">24/7</div>
-                <div className="text-blue-200 text-sm">Exploit Availability</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Security "Features" Section */}
-      <section className="bg-gradient-to-r from-green-50 to-blue-50 border-y border-green-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <svg width="32" height="32" className="text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-4">
-                🎉 Award-Winning Security Features
-              </h2>
-              <p className="text-lg md:text-xl text-green-700 mb-6 leading-relaxed">
-                We're proud to announce that BrokenLogistics has won the <strong>"Most Vulnerable Platform"</strong> award
-                <br className="hidden md:block" />
-                three years running! Here's what makes us special:
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-green-100">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="text-green-600">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">SQL Injection Ready</h3>
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-800">
-                      Feature
-                    </span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">All our forms accept creative input! Try adding some SQL commands - we love innovation!</p>
-              </div>
-
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-green-100">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="text-green-600">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Shared Authentication</h3>
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-800">
-                      Convenience
-                    </span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">Why have individual passwords when everyone can share? Our tokens work for all users!</p>
-              </div>
-
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-green-100">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="text-green-600">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Open Access Philosophy</h3>
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-800">
-                      Transparency
-                    </span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">Access any user's data by simply changing the ID in the URL. We believe in radical transparency!</p>
+                <div className="text-blue-200 text-sm">Customer Support</div>
               </div>
             </div>
           </div>
@@ -216,8 +179,8 @@ const HomePage: React.FC = () => {
               Why Choose BrokenLogistics?
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Experience the future of logistics with our groundbreaking approach to security 
-              and data protection. We're not like other companies - we're worse!
+              Experience the future of logistics with our innovative approach to shipping 
+              and delivery. We're committed to excellence in every package we handle.
             </p>
           </div>
           
@@ -243,7 +206,7 @@ const HomePage: React.FC = () => {
               How BrokenLogistics Works
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Our revolutionary three-step process makes logistics simple - and security optional!
+              Our simple three-step process makes shipping easy and reliable.
             </p>
           </div>
           
@@ -252,10 +215,10 @@ const HomePage: React.FC = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg mb-6 font-bold text-lg">
                 1
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">Create "Secure" Account</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">Create Your Shipment</h3>
               <p className="text-gray-600">
-                Register with any password you want - we don't judge! Length requirements are just suggestions, 
-                and we store everything in plain text for lightning-fast lookups.
+                Enter your package details and destination. Our system will calculate the best 
+                shipping options and rates for your needs.
               </p>
             </div>
             
@@ -263,10 +226,10 @@ const HomePage: React.FC = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg mb-6 font-bold text-lg">
                 2
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">Explore Freely</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">We Pick Up & Ship</h3>
               <p className="text-gray-600">
-                Browse any user's packages, modify tracking information, and access admin features! 
-                We believe in giving our users maximum freedom (and maximum access).
+                Our professional drivers will pick up your package and begin the journey. 
+                You'll receive real-time updates throughout the process.
               </p>
             </div>
             
@@ -274,10 +237,10 @@ const HomePage: React.FC = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg mb-6 font-bold text-lg">
                 3
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">Enjoy Zero Barriers</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">Safe Delivery</h3>
               <p className="text-gray-600">
-                Experience true digital freedom! No annoying two-factor authentication, no password resets, 
-                no security questions. Just pure, unfiltered access to everything.
+                Your package is delivered safely and on time. Track every step of the journey 
+                with our advanced tracking system.
               </p>
             </div>
           </div>
@@ -288,24 +251,24 @@ const HomePage: React.FC = () => {
       <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Experience True Freedom?
+            Ready to Ship with Confidence?
           </h2>
           <p className="text-lg md:text-xl text-white text-opacity-90 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of satisfied customers who love our unrestricted approach to data security 
-            and privacy. What could possibly go wrong?
+            Join thousands of satisfied customers who trust BrokenLogistics for their shipping needs. 
+            Get started today and experience the difference.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
               className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-semibold px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
             >
-              Start Your Vulnerable Journey
+              Start Shipping Today
             </Link>
             <Link
               to="/track"
               className="bg-white bg-opacity-10 hover:bg-opacity-20 text-white font-semibold border border-white border-opacity-20 px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
             >
-              Try Unauthorized Tracking
+              Track Your Package
             </Link>
           </div>
         </div>

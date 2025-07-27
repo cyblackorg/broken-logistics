@@ -9,12 +9,13 @@ interface User {
   email: string;
   role: string;
   name: string;
+  customer_type?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string, role?: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, role?: string, customerType?: string, companyName?: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -93,15 +94,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function that connects to vulnerable backend
-  const register = async (name: string, email: string, password: string, role: string = 'customer'): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, role: string = 'customer', customerType: string = 'individual', companyName?: string): Promise<boolean> => {
     try {
       setLoading(true);
       
+      // Split name into first and last name (simple approach)
+      const nameParts = name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-        name,
+        firstName,
+        lastName,
         email,
         password,
-        role
+        role,
+        customerType,
+        companyName
       });
 
       if (response.data.success) {

@@ -11,9 +11,18 @@ services:
     environment:
       - REACT_APP_API_URL=http://localhost:5000
       - REACT_APP_ENV=development
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: sync
+          path: ./frontend/public
+          target: /app/public
+        - action: rebuild
+          path: ./frontend/package.json
     depends_on:
       - backend
     networks:
@@ -31,9 +40,15 @@ services:
       - DATABASE_URL=postgresql://postgres:vulnerable_password@db:5432/brokenlogistics
       - JWT_SECRET=super_weak_secret_123
       - PORT=5000
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./backend/package.json
     depends_on:
       - db
     networks:

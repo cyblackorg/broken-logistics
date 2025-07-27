@@ -8,6 +8,8 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('customer');
+  const [customerType, setCustomerType] = useState('individual');
+  const [companyName, setCompanyName] = useState('');
   const { register, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    const success = await register(name, email, password, role);
+    const success = await register(name, email, password, role, customerType, companyName);
     if (success) {
       navigate('/login');
     }
@@ -46,14 +48,6 @@ const RegisterPage: React.FC = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Join BrokenLogistics today
-          </p>
-        </div>
-
-        {/* Vulnerable: Allow role selection in registration */}
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <h3 className="text-sm font-medium text-red-800 mb-2">🔥 Privilege Escalation Risk!</h3>
-          <p className="text-xs text-red-700">
-            Users can select their own role during registration - major security flaw!
           </p>
         </div>
 
@@ -110,7 +104,6 @@ const RegisterPage: React.FC = () => {
               />
             </div>
 
-            {/* Vulnerable: Allow users to select admin role */}
             <div>
               <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                 Account Type
@@ -126,10 +119,51 @@ const RegisterPage: React.FC = () => {
                 <option value="driver">Driver</option>
                 <option value="admin">Admin</option>
               </select>
-              <p className="mt-1 text-xs text-red-600">
-                🔥 Vulnerability: Users can self-assign admin privileges!
-              </p>
             </div>
+
+            {/* Customer Type Selection */}
+            {role === 'customer' && (
+              <>
+                <div>
+                  <label htmlFor="customerType" className="block text-sm font-medium text-gray-700">
+                    Customer Type
+                  </label>
+                  <select
+                    id="customerType"
+                    name="customerType"
+                    value={customerType}
+                    onChange={(e) => setCustomerType(e.target.value)}
+                    className="mt-1 relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="individual">Individual Customer</option>
+                    <option value="business">Business Customer</option>
+                  </select>
+                  <p className="mt-1 text-xs text-blue-600">
+                    💼 Business customers get automatic discounts!
+                  </p>
+                </div>
+
+                {customerType === 'business' && (
+                  <div>
+                    <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                      Company Name
+                    </label>
+                    <input
+                      id="companyName"
+                      name="companyName"
+                      type="text"
+                      className="mt-1 relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Your company name"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                    />
+                    <p className="mt-1 text-xs text-green-600">
+                      🎯 Business accounts get up to 25% discount and credit terms!
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           <div>
@@ -151,13 +185,6 @@ const RegisterPage: React.FC = () => {
             </Link>
           </div>
         </form>
-
-        {/* Vulnerable: Expose debug information */}
-        <div className="mt-6 p-3 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-xs text-red-600">
-            🔥 Debug: Registration allows privilege escalation and weak password validation
-          </p>
-        </div>
       </div>
     </div>
   );

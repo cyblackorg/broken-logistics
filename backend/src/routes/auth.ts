@@ -36,7 +36,7 @@ const JWT_EXPIRES_IN = '24h'; // Long expiration time
  */
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, firstName, lastName, role = 'customer' } = req.body;
+    const { email, password, firstName, lastName, role = 'customer', customerType = 'individual', companyName } = req.body;
 
     // Log sensitive registration data (vulnerable)
     logSensitiveOperation('USER_REGISTRATION', req.body, {
@@ -64,8 +64,8 @@ router.post('/register', async (req, res) => {
     // Vulnerable: Store password in plain text
     // In a real app, NEVER do this - always hash passwords!
     const insertUserQuery = `
-      INSERT INTO users (email, password, first_name, last_name, role)
-      VALUES ('${email}', '${password}', '${firstName}', '${lastName}', '${role}')
+      INSERT INTO users (email, password, first_name, last_name, role, customer_type, company_name)
+      VALUES ('${email}', '${password}', '${firstName}', '${lastName}', '${role}', '${customerType}', '${companyName || null}')
       RETURNING *
     `;
 
@@ -106,6 +106,8 @@ router.post('/register', async (req, res) => {
         firstName: user.first_name,
         lastName: user.last_name,
         role: user.role,
+        customer_type: user.customer_type,
+        company_name: user.company_name,
         // Vulnerable: Expose password in response
         password: user.password
       },

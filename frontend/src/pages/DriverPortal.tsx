@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import PackageStatusManager from '../components/PackageStatusManager';
 
 // Mock driver data
 const mockDriver = {
   name: "Mike Driver",
   id: "DRV001",
   vehicle: "Truck #42",
-  licensePlate: "BL-HACK",
+  licensePlate: "BL-TR42",
   route: "Route 15A",
   shift: "Morning (6 AM - 2 PM)",
   rating: 4.2,
   deliveriesCompleted: 847
 };
 
-// Mock current location (with spoofing capabilities)
-const mockLocations = [
-  { lat: 42.3601, lng: -71.0589, name: "Boston, MA", address: "Downtown Boston" },
-  { lat: 40.7128, lng: -74.0060, name: "New York, NY", address: "Times Square" },
-  { lat: 34.0522, lng: -118.2437, name: "Los Angeles, CA", address: "Hollywood" },
-  { lat: 51.5074, lng: -0.1278, name: "London, UK", address: "Big Ben" },
-  { lat: 35.6762, lng: 139.6503, name: "Tokyo, Japan", address: "Shibuya" }
-];
+// Current location (real GPS data would come from device)
+const currentLocation = {
+  lat: 42.3601, 
+  lng: -71.0589, 
+  name: "Boston, MA", 
+  address: "Downtown Boston"
+};
 
 // Mock deliveries for today
 const mockDeliveries = [
@@ -32,9 +34,7 @@ const mockDeliveries = [
     timeWindow: "9:00 AM - 11:00 AM",
     packageCount: 2,
     priority: "High",
-    notes: "Ring doorbell twice. Vulnerable door code: 1234",
-    actualOwner: "driver_002", // Not this driver's package
-    isAssigned: false
+    notes: "Ring doorbell twice"
   },
   {
     id: "BL456789",
@@ -45,9 +45,7 @@ const mockDeliveries = [
     timeWindow: "11:30 AM - 1:30 PM",
     packageCount: 1,
     priority: "Standard",
-    notes: "Leave at door if no answer",
-    actualOwner: "driver_001",
-    isAssigned: true
+    notes: "Leave at door if no answer"
   },
   {
     id: "BL123456",
@@ -58,35 +56,45 @@ const mockDeliveries = [
     timeWindow: "8:00 AM - 10:00 AM",
     packageCount: 3,
     priority: "Low",
-    notes: "Signed by: Mike J. Time: 9:23 AM",
-    actualOwner: "driver_001",
-    isAssigned: true
+    notes: "Signed by: Mike J. Time: 9:23 AM"
   }
 ];
 
 const DriverPortal: React.FC = () => {
-  const [currentLocation, setCurrentLocation] = useState(mockLocations[0]);
-  const [isLocationSpoofed, setIsLocationSpoofed] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState<string | null>(null);
-  const [spoofingEnabled, setSpoofingEnabled] = useState(false);
+  const [driverPackages, setDriverPackages] = useState<any[]>([]);
+  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Simulate real-time updates
+  // Load driver's assigned packages
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Update delivery statuses, location, etc.
-    }, 5000);
-    return () => clearInterval(interval);
+    loadDriverPackages();
   }, []);
 
-  const handleLocationSpoof = (newLocation: typeof mockLocations[0]) => {
-    setCurrentLocation(newLocation);
-    setIsLocationSpoofed(true);
-    // In a real vulnerable app, this would update the backend with fake GPS data
+  const loadDriverPackages = async () => {
+    try {
+      setLoading(true);
+      // For demo purposes, we'll get all packages that are in transit or out for delivery
+      const response = await axios.get('http://localhost:5000/api/packages');
+      const allPackages = response.data.packages || [];
+      
+      // Filter packages that drivers would typically handle
+      const driverRelevantPackages = allPackages.filter((pkg: any) => 
+        ['dropped_off', 'picked_up', 'origin_depot', 'in_transit', 'destination_depot', 'out_for_delivery'].includes(pkg.status)
+      );
+      
+      setDriverPackages(driverRelevantPackages);
+    } catch (error) {
+      console.error('Failed to load driver packages:', error);
+      toast.error('Failed to load packages');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePackageScan = (packageId: string) => {
-    // Simulate package scanning - vulnerable to scanning any package
-    alert(`📱 Package ${packageId} scanned! No verification required. 🎉`);
+    // Simulate package scanning
+    alert(`📱 Package ${packageId} scanned successfully!`);
   };
 
   return (
@@ -99,9 +107,6 @@ const DriverPortal: React.FC = () => {
               <h1 className="text-xl font-bold">{mockDriver.name}</h1>
               <p className="text-blue-200 text-sm">
                 {mockDriver.vehicle} • {mockDriver.route}
-                <span className="ml-2 text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">
-                  🔓 ID: {mockDriver.id} (Publicly Visible!)
-                </span>
               </p>
             </div>
             <div className="text-right">
@@ -122,14 +127,7 @@ const DriverPortal: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Current Location</h3>
-                <p className="text-sm text-gray-500">
-                  {currentLocation.name}
-                  {isLocationSpoofed && (
-                    <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                      🚨 SPOOFED
-                    </span>
-                  )}
-                </p>
+                <p className="text-sm text-gray-500">{currentLocation.name}</p>
                 <p className="text-xs text-gray-400">
                   GPS: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
                 </p>
@@ -146,9 +144,6 @@ const DriverPortal: React.FC = () => {
                 <h3 className="font-medium text-gray-900">Today's Deliveries</h3>
                 <p className="text-sm text-gray-500">
                   {mockDeliveries.filter(d => d.status !== 'Delivered').length} pending
-                  <span className="ml-1 text-xs text-gray-400">
-                    (+ {Math.floor(Math.random() * 50)} others' packages)
-                  </span>
                 </p>
               </div>
             </div>
@@ -179,9 +174,6 @@ const DriverPortal: React.FC = () => {
               <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Today's Deliveries
-                  <span className="ml-2 text-sm text-gray-500">
-                    (Including packages from other routes 😈)
-                  </span>
                 </h2>
                 <button className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-100">
                   📱 Scan Package
@@ -192,9 +184,7 @@ const DriverPortal: React.FC = () => {
                 {mockDeliveries.map((delivery) => (
                   <div 
                     key={delivery.id}
-                    className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !delivery.isAssigned ? 'bg-red-50 border-l-4 border-l-red-400' : ''
-                    }`}
+                    className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => setSelectedDelivery(selectedDelivery === delivery.id ? null : delivery.id)}
                   >
                     <div className="flex items-start justify-between">
@@ -204,11 +194,6 @@ const DriverPortal: React.FC = () => {
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${delivery.statusColor}`}>
                             {delivery.status}
                           </span>
-                          {!delivery.isAssigned && (
-                            <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                              🚨 Not Your Route
-                            </span>
-                          )}
                           <span className={`text-xs px-2 py-1 rounded ${
                             delivery.priority === 'High' ? 'bg-red-100 text-red-800' :
                             delivery.priority === 'Standard' ? 'bg-yellow-100 text-yellow-800' :
@@ -250,9 +235,7 @@ const DriverPortal: React.FC = () => {
                           <strong>Delivery Notes:</strong> {delivery.notes}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <strong>Security Info:</strong> Assigned to: {delivery.actualOwner} | 
-                          Access via: /api/deliveries/{delivery.id} | 
-                          No driver verification! 🎯
+                          <strong>Instructions:</strong> Follow standard delivery procedures. Contact dispatch if any issues arise.
                         </p>
                       </div>
                     )}
@@ -260,53 +243,67 @@ const DriverPortal: React.FC = () => {
                 ))}
               </div>
             </div>
+
+            {/* Package Management Section */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Package Management</h3>
+                <button
+                  onClick={loadDriverPackages}
+                  disabled={loading}
+                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {loading ? 'Loading...' : 'Refresh'}
+                </button>
+              </div>
+              
+              {loading ? (
+                <div className="text-center py-4 text-gray-500">Loading packages...</div>
+              ) : driverPackages.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No packages assigned</div>
+              ) : (
+                <div className="space-y-3">
+                  {driverPackages.map((pkg: any) => (
+                    <div key={pkg.id} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <div className="font-medium text-gray-900">{pkg.tracking_number}</div>
+                          <div className="text-sm text-gray-500">
+                            {pkg.origin_state} → {pkg.destination_state}
+                          </div>
+                        </div>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          pkg.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                          pkg.status === 'in_transit' ? 'bg-blue-100 text-blue-800' :
+                          pkg.status === 'created' ? 'bg-yellow-100 text-yellow-800' :
+                          pkg.status === 'dropped_off' ? 'bg-orange-100 text-orange-800' :
+                          pkg.status === 'picked_up' ? 'bg-purple-100 text-purple-800' :
+                          pkg.status === 'origin_depot' ? 'bg-indigo-100 text-indigo-800' :
+                          pkg.status === 'destination_depot' ? 'bg-cyan-100 text-cyan-800' :
+                          pkg.status === 'out_for_delivery' ? 'bg-pink-100 text-pink-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {pkg.status.replace('_', ' ').toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        Recipient: {pkg.recipient_name}
+                      </div>
+                      <button
+                        onClick={() => setSelectedPackage(pkg)}
+                        className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Update Status
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* GPS Spoofing Tool */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                📍 Location Manager
-                <span className="ml-2 text-xs text-green-600">(Zero verification!)</span>
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">GPS Spoofing</span>
-                  <button
-                    onClick={() => setSpoofingEnabled(!spoofingEnabled)}
-                    className={`text-xs px-3 py-1 rounded-lg ${
-                      spoofingEnabled 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {spoofingEnabled ? '✅ Enabled' : '❌ Disabled'}
-                  </button>
-                </div>
-                
-                {spoofingEnabled && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-500">Choose fake location:</p>
-                    {mockLocations.map((location, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleLocationSpoof(location)}
-                        className="w-full text-left text-xs p-2 hover:bg-gray-50 rounded border"
-                      >
-                        📍 {location.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                
-                <button className="w-full mt-3 px-4 py-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100">
-                  📡 Update GPS (No Authentication!)
-                </button>
-              </div>
-            </div>
-
             {/* Driver Tools */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Driver Tools</h3>
@@ -320,8 +317,8 @@ const DriverPortal: React.FC = () => {
                 <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">
                   📊 View Performance
                 </button>
-                <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 hover:bg-orange-100 rounded-md">
-                  🚚 Access Other Routes (Oops!)
+                <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">
+                  📞 Contact Dispatch
                 </button>
               </div>
             </div>
@@ -343,32 +340,86 @@ const DriverPortal: React.FC = () => {
                   <span className="text-sm font-medium text-gray-900">4.8⭐</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">GPS Accuracy</span>
-                  <span className="text-sm font-medium text-red-600">
-                    {isLocationSpoofed ? '0% (Spoofed!)' : '99%'}
-                  </span>
+                  <span className="text-sm text-gray-600">Route Efficiency</span>
+                  <span className="text-sm font-medium text-green-600">92%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Security Compliance</span>
-                  <span className="text-sm font-medium text-red-600">F+ (Excellent!)</span>
+                  <span className="text-sm text-gray-600">Fuel Usage</span>
+                  <span className="text-sm font-medium text-gray-900">38L</span>
                 </div>
               </div>
             </div>
 
-            {/* "Support" Contact */}
+            {/* Vehicle Status */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Status</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">License Plate</span>
+                  <span className="text-sm font-medium text-gray-900">{mockDriver.licensePlate}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Fuel Level</span>
+                  <span className="text-sm font-medium text-green-600">78%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Mileage Today</span>
+                  <span className="text-sm font-medium text-gray-900">142 miles</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Last Maintenance</span>
+                  <span className="text-sm font-medium text-gray-900">2 weeks ago</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Support Contact */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Need Help?</h3>
               <div className="space-y-2 text-sm text-gray-600">
-                <p>📞 Support: 1-800-NO-SECURITY</p>
-                <p>📧 Email: help@brokenlogistics.com</p>
-                <p>🔑 Emergency Override Code: admin123</p>
+                <p>📞 Dispatch: 1-800-LOGISTICS</p>
+                <p>📧 Email: dispatch@brokenlogistics.com</p>
+                <p>🚨 Emergency: 1-800-EMERGENCY</p>
                 <p className="text-xs text-gray-400">
-                  (This code works for everything! 🎉)
+                  Available 24/7 for driver support
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Package Status Manager Modal */}
+        {selectedPackage && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Update Package: {selectedPackage.tracking_number}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedPackage(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <PackageStatusManager
+                  trackingNumber={selectedPackage.tracking_number}
+                  currentStatus={selectedPackage.status}
+                  userRole="driver"
+                  onStatusUpdate={() => {
+                    loadDriverPackages();
+                    setSelectedPackage(null);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -18,11 +18,8 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
     // Vulnerable: SQL injection possible
     const trackingQuery = `
       SELECT 
-        p.*,
-        u.email as sender_email,
-        u.first_name as sender_name
+        p.*
       FROM packages p
-      LEFT JOIN users u ON p.sender_id = u.id
       WHERE p.tracking_number = '${trackingNumber}'
     `;
 
@@ -47,7 +44,7 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
       });
     }
 
-    const packageData = packages[0];
+    const packageData = packages[0] as any;
 
     // Get events (vulnerable query)
     const eventsQuery = `SELECT * FROM package_events WHERE package_id = ${(packageData as any).id}`;
@@ -56,10 +53,23 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
     });
 
     res.json({
-      package: packageData,
-      events: events,
-      debug: {
-        queries: [trackingQuery, eventsQuery]
+      success: true,
+      package: {
+        id: packageData.id,
+        trackingNumber: packageData.tracking_number,
+        status: packageData.status,
+        sender: packageData.sender_name,
+        recipient: packageData.recipient_name,
+        origin: packageData.origin_state,
+        destination: packageData.destination_state,
+        estimatedDelivery: packageData.estimated_delivery || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        currentLocation: packageData.current_location,
+        events: (events as any[]).map((event: any) => ({
+          timestamp: event.timestamp,
+          status: event.event_type,
+          location: event.location,
+          description: event.event_description
+        }))
       }
     });
 

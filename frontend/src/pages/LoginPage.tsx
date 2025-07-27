@@ -61,12 +61,6 @@ const LoginPage: React.FC = () => {
     { role: 'Admin', email: 'admin@brokenlogistics.com', password: 'admin123' }
   ];
 
-  const sqlInjectionExamples = [
-    "admin@example.com'--",
-    "admin@example.com' OR '1'='1'--",
-    "'; DROP TABLE users; --"
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full space-y-8">
@@ -89,19 +83,19 @@ const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Test Credentials Warning */}
-        <div className="border-2 border-dashed border-orange-300 bg-orange-50 p-6 rounded-lg">
+        {/* Demo Credentials */}
+        <div className="border-2 border-dashed border-blue-300 bg-blue-50 p-6 rounded-lg">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
-              <svg width="20" height="20" className="text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg width="20" height="20" className="text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-orange-800 mb-2">
-                🔥 Demo Credentials Available
+              <h3 className="text-sm font-medium text-blue-800 mb-2">
+                Demo Credentials
               </h3>
-              <div className="space-y-2 text-xs text-orange-700">
+              <div className="space-y-2 text-xs text-blue-700">
                 {exampleCredentials.map((cred, index) => (
                   <div key={index} className="flex justify-between items-center bg-white bg-opacity-50 p-2 rounded">
                     <span className="font-medium">{cred.role}:</span>
@@ -213,32 +207,6 @@ const LoginPage: React.FC = () => {
               >
                 Create Account
               </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* SQL Injection Demo */}
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0">
-              <svg width="20" height="20" className="text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-red-800 mb-2">
-                🚨 SQL Injection Vulnerability
-              </h3>
-              <p className="text-sm text-red-700 mb-3">
-                This login form is vulnerable to SQL injection. Try these payloads:
-              </p>
-              <div className="space-y-1">
-                {sqlInjectionExamples.map((payload, index) => (
-                  <div key={index} className="bg-gray-900 text-green-400 p-2 rounded font-mono text-xs">
-                    {payload}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

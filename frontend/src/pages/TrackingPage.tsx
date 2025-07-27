@@ -47,9 +47,8 @@ const TrackingPage: React.FC = () => {
       setLoading(true);
       setError('');
       
-      // Vulnerable: Direct SQL injection in tracking endpoint
       const response = await axios.get(
-        `${API_BASE_URL}/tracking/${encodeURIComponent(trackingNumber)}`
+        `${API_BASE_URL}/track/${encodeURIComponent(trackingNumber)}`
       );
 
       if (response.data.success) {
@@ -64,12 +63,6 @@ const TrackingPage: React.FC = () => {
       const errorMessage = err.response?.data?.message || 'Error tracking package';
       setError(errorMessage);
       setTrackingData(null);
-      
-      // Log vulnerability attempts for educational purposes
-      if (err.response?.data?.vulnerabilityDetected) {
-        console.warn('🔥 Vulnerability attempt detected:', err.response.data.vulnerabilityType);
-      }
-      
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -86,15 +79,6 @@ const TrackingPage: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Track Your Package</h1>
         
-        {/* Vulnerable: Show example tracking numbers */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-          <h3 className="text-sm font-medium text-yellow-800 mb-2">🔥 Sample Tracking Numbers (Vulnerable!)</h3>
-          <div className="text-xs text-yellow-700 space-x-4">
-            <span><strong>Regular:</strong> BL001, BL002, BL003</span>
-            <span className="text-red-600"><strong>SQL Injection:</strong> BL001&apos; OR &apos;1&apos;=&apos;1&apos; --</span>
-          </div>
-        </div>
-
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <form onSubmit={handleSubmit} className="mb-6">
             <div className="flex flex-col sm:flex-row gap-4">
@@ -145,7 +129,13 @@ const TrackingPage: React.FC = () => {
                       <span className={`ml-2 px-2 py-1 rounded text-xs ${
                         trackingData.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         trackingData.status === 'in_transit' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        trackingData.status === 'created' ? 'bg-yellow-100 text-yellow-800' :
+                        trackingData.status === 'dropped_off' ? 'bg-orange-100 text-orange-800' :
+                        trackingData.status === 'picked_up' ? 'bg-purple-100 text-purple-800' :
+                        trackingData.status === 'origin_depot' ? 'bg-indigo-100 text-indigo-800' :
+                        trackingData.status === 'destination_depot' ? 'bg-cyan-100 text-cyan-800' :
+                        trackingData.status === 'out_for_delivery' ? 'bg-pink-100 text-pink-800' :
+                        'bg-red-100 text-red-800'
                       }`}>
                         {trackingData.status.replace('_', ' ').toUpperCase()}
                       </span>
@@ -156,20 +146,16 @@ const TrackingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Vulnerable: Expose sensitive information */}
-                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                  <h3 className="font-semibold text-red-900 mb-3">🔥 Exposed Sensitive Data</h3>
-                  <div className="space-y-2 text-sm text-red-700">
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h3 className="font-semibold text-blue-900 mb-3">Package Details</h3>
+                  <div className="space-y-2 text-sm text-blue-700">
                     <p><strong>Sender:</strong> {trackingData.sender}</p>
                     <p><strong>Recipient:</strong> {trackingData.recipient}</p>
                     <p><strong>Package ID:</strong> {trackingData.id}</p>
                     {trackingData.currentLocation && (
-                      <p><strong>GPS Location:</strong> {trackingData.currentLocation}</p>
+                      <p><strong>Current Location:</strong> {trackingData.currentLocation}</p>
                     )}
                   </div>
-                  <p className="text-xs text-red-600 mt-2">
-                    ⚠️ This information should be protected by authentication!
-                  </p>
                 </div>
               </div>
 
@@ -200,15 +186,12 @@ const TrackingPage: React.FC = () => {
           )}
         </div>
 
-        {/* Vulnerability Warning */}
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <h3 className="text-sm font-medium text-red-800 mb-2">🔥 Security Vulnerabilities</h3>
-          <ul className="text-xs text-red-700 space-y-1">
-            <li>• No authentication required to view package details</li>
-            <li>• SQL injection possible in tracking number field</li>
-            <li>• Sensitive personal information exposed in results</li>
-            <li>• GPS coordinates and internal IDs leaked</li>
-          </ul>
+        {/* Help Section */}
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <h3 className="text-sm font-medium text-blue-800 mb-2">Need Help?</h3>
+          <p className="text-sm text-blue-700">
+            If you're having trouble tracking your package, please contact our customer service team.
+          </p>
         </div>
       </div>
     </div>

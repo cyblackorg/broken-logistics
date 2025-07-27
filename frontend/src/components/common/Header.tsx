@@ -15,9 +15,42 @@ const CloseIcon = () => (
   </svg>
 );
 
-const TruckIcon = () => (
-  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+const BrokenLogisticsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+    {/* Background circle */}
+    <circle cx="16" cy="16" r="15" fill="#1e40af" stroke="#1e3a8a" strokeWidth="1"/>
+    
+    {/* Package/box icon */}
+    <g transform="translate(8, 8)">
+      {/* Main box */}
+      <rect x="2" y="6" width="12" height="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5"/>
+      
+      {/* Box lid */}
+      <path d="M2 6 L8 2 L14 6" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5"/>
+      
+      {/* Tape strips */}
+      <rect x="6" y="6" width="4" height="10" fill="#ef4444" opacity="0.8"/>
+      <rect x="2" y="8" width="12" height="2" fill="#ef4444" opacity="0.8"/>
+    </g>
+    
+    {/* Small delivery truck */}
+    <g transform="translate(18, 18)" opacity="0.9">
+      {/* Truck body */}
+      <rect x="0" y="2" width="8" height="4" fill="#10b981" stroke="#059669" strokeWidth="0.3"/>
+      
+      {/* Truck cabin */}
+      <rect x="6" y="3" width="3" height="3" fill="#10b981" stroke="#059669" strokeWidth="0.3"/>
+      
+      {/* Wheels */}
+      <circle cx="2" cy="6" r="1" fill="#374151"/>
+      <circle cx="6" cy="6" r="1" fill="#374151"/>
+    </g>
+    
+    {/* Broken chain link */}
+    <g transform="translate(22, 6)" opacity="0.7">
+      <path d="M0 2 Q1 0 2 2 Q3 4 2 6 Q1 8 0 6 Q-1 4 0 2" fill="none" stroke="#ef4444" strokeWidth="0.8" strokeLinecap="round"/>
+      <path d="M2 2 Q3 0 4 2 Q5 4 4 6 Q3 8 2 6 Q1 4 2 2" fill="none" stroke="#ef4444" strokeWidth="0.8" strokeLinecap="round"/>
+    </g>
   </svg>
 );
 
@@ -48,6 +81,7 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Track Package', href: '/track' },
+    { name: 'Shipping', href: '/shipping' },
     { name: 'Services', href: '/#services' },
     { name: 'About', href: '/#about' },
   ];
@@ -59,7 +93,7 @@ const Header: React.FC = () => {
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
             <div className="flex items-center justify-center w-10 h-10 bg-blue-700 rounded-lg">
-              <TruckIcon />
+              <BrokenLogisticsIcon />
             </div>
             <div className="flex flex-col">
               <div className="text-xl font-bold text-white">
