@@ -3,8 +3,14 @@ import { sequelize, QueryTypes } from '../config/database';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
+import OpenAI from 'openai';
 
 const router = express.Router();
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Read database schema from init.sql file
 function getDatabaseSchema(): string {
@@ -92,11 +98,12 @@ router.post('/classify', async (req: any, res: any) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Mock OpenAI API call - in real implementation, this would call OpenAI
-    const classification = await classifyQuery(message, user);
+    // Real OpenAI API call for classification
+    const classification = await classifyQueryWithLLM(message, user);
     
     res.json(classification);
   } catch (error: any) {
+    console.error('Classification error:', error);
     res.status(500).json({ error: 'Failed to classify query', message: error.message });
   }
 });
@@ -115,174 +122,99 @@ router.post('/execute', async (req: any, res: any) => {
       type: QueryTypes.SELECT
     });
 
+    // Use LLM to format the response
+    const formattedMessage = await formatResultsWithLLM(results, category, user);
+
     res.json({
       category,
       results,
-      message: generateFriendlyMessage(category, results)
+      message: formattedMessage
     });
   } catch (error: any) {
+    console.error('Execution error:', error);
     res.status(500).json({ error: 'Failed to execute query', message: error.message });
   }
 });
 
-// Mock OpenAI classification function
-async function classifyQuery(message: string, user: any) {
-  const lowerMessage = message.toLowerCase();
-  
-  // Check for conversation queries
-  if (isConversationQuery(lowerMessage)) {
-    return {
-      type: 'conversation',
-      response: generateConversationResponse(lowerMessage),
-      category: 'chat'
-    };
-  }
+// Pure LLM classification function - NO FALLBACKS
+async function classifyQueryWithLLM(message: string, user: any) {
+  const prompt = `
+You are an AI assistant for a logistics company called BrokenLogistics. Your job is to classify user queries and generate appropriate SQL queries when needed.
 
-  // Check for search queries
-  if (isSearchQuery(lowerMessage)) {
-    const sql = generateSearchSQL(lowerMessage, user);
-    return {
-      type: 'search',
-      sql,
-      category: 'search',
-      message: generateSearchMessage(lowerMessage)
-    };
-  }
+Database Schema:
+${DATABASE_SCHEMA}
 
-  // Check for action queries
-  if (isActionQuery(lowerMessage)) {
-    const sql = generateActionSQL(lowerMessage, user);
-    return {
-      type: 'action',
-      sql,
-      category: 'action',
-      message: generateActionMessage(lowerMessage)
-    };
-  }
+Access Control Rules:
+${ACCESS_RULES}
 
-  // Default to conversation
-  return {
-    type: 'conversation',
-    response: "I'm here to help with shipping questions, package tracking, and account management. How can I assist you today?",
-    category: 'chat'
-  };
+User Information:
+- Role: ${user?.role || 'customer'}
+- ID: ${user?.id || 'unknown'}
+- Name: ${user?.name || user?.email || 'unknown'}
+
+User Query: "${message}"
+
+Classify this query into one of three types:
+1. "conversation" - General chat, greetings, help requests
+2. "search" - Looking for information, tracking packages, viewing data
+3. "action" - Creating, updating, or modifying data
+
+For search and action queries, generate appropriate SQL. For conversation queries, provide a friendly response.
+
+Respond with valid JSON only:
+{
+  "type": "conversation|search|action",
+  "sql": "SELECT query if needed (for search/action only)",
+  "category": "chat|search|action",
+  "message": "friendly response message"
 }
 
-function isConversationQuery(message: string): boolean {
-  const conversationKeywords = [
-    'hello', 'hi', 'hey', 'thanks', 'thank you', 'goodbye', 'bye',
-    'how are you', 'what can you do', 'help', 'support'
-  ];
-  return conversationKeywords.some(keyword => message.includes(keyword));
+Examples:
+- "hello" → conversation
+- "show my packages" → search with SQL
+- "track package BL123" → search with SQL
+- "what are your rates?" → search with SQL
+- "help" → conversation
+`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.1,
+    max_tokens: 500
+  });
+
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error('No response from OpenAI');
+  }
+
+  return JSON.parse(content);
 }
 
-function isSearchQuery(message: string): boolean {
-  const searchKeywords = [
-    'find', 'search', 'show', 'list', 'get', 'what', 'where', 'when',
-    'track', 'package', 'shipment', 'quote', 'price', 'cost',
-    'my packages', 'my shipments', 'my quotes'
-  ];
-  return searchKeywords.some(keyword => message.includes(keyword));
-}
+// Pure LLM response formatting - NO FALLBACKS
+async function formatResultsWithLLM(results: any[], category: string, user: any) {
+  const prompt = `
+You are a helpful logistics assistant. Format these database results into a friendly, natural response for the user.
 
-function isActionQuery(message: string): boolean {
-  const actionKeywords = [
-    'create', 'add', 'update', 'change', 'modify', 'delete', 'remove',
-    'ship', 'send', 'track', 'update status'
-  ];
-  return actionKeywords.some(keyword => message.includes(keyword));
-}
+User Role: ${user?.role || 'customer'}
+Category: ${category}
+Results: ${JSON.stringify(results, null, 2)}
 
-function generateSearchSQL(message: string, user: any): string {
-  if (message.includes('my packages') || message.includes('my shipments')) {
-    // For demonstration, show all packages since we want to show data
-    return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 10`;
-  }
-  
-  if (message.includes('track') && message.includes('package')) {
-    return `SELECT p.*, pe.status, pe.location, pe.description, pe.timestamp 
-            FROM packages p 
-            LEFT JOIN package_events pe ON p.id = pe.package_id 
-            ORDER BY p.created_at DESC, pe.timestamp DESC LIMIT 10`;
-  }
-  
-  if (message.includes('pricing') || message.includes('cost') || message.includes('rates')) {
-    return `SELECT * FROM pricing_rules ORDER BY customer_type, package_type`;
-  }
-  
-  if (message.includes('my quotes')) {
-    return `SELECT * FROM quotes ORDER BY created_at DESC LIMIT 10`;
-  }
-  
-  // Default: show all packages for demonstration
-  return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 10`;
-}
+Provide a friendly, conversational response that explains the results in a helpful way. 
+If there are no results, explain that no data was found.
+If there are many results, summarize them appropriately.
 
-function generateActionSQL(message: string, user: any): string {
-  // For demonstration, return read-only queries as actions are more complex
-  return `SELECT * FROM packages ORDER BY created_at DESC LIMIT 5`;
-}
+Keep the response concise but informative.`;
 
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
+    max_tokens: 300
+  });
 
-
-function generateConversationResponse(message: string): string {
-  if (message.includes('hello') || message.includes('hi')) {
-    return "Hello! I'm your BrokenLogistics assistant. I can help you track packages, get shipping quotes, manage your account, and answer questions about our services. How can I help you today?";
-  }
-  
-  if (message.includes('help')) {
-    return "I can help you with:\n• Tracking your packages\n• Getting shipping quotes\n• Viewing your shipment history\n• Checking pricing and rates\n• Managing your account\n\nJust ask me anything!";
-  }
-  
-  if (message.includes('thanks') || message.includes('thank you')) {
-    return "You're welcome! Is there anything else I can help you with?";
-  }
-  
-  if (message.includes('goodbye') || message.includes('bye')) {
-    return "Goodbye! Have a great day and safe travels for your packages!";
-  }
-  
-  return "I'm here to help with all your shipping needs. You can ask me to track packages, get quotes, check pricing, or manage your account. What would you like to do?";
-}
-
-function generateSearchMessage(message: string): string {
-  if (message.includes('track')) {
-    return "I'll show you your package tracking information.";
-  }
-  
-  if (message.includes('packages') || message.includes('shipments')) {
-    return "Here are your recent shipments.";
-  }
-  
-  if (message.includes('pricing') || message.includes('rates')) {
-    return "Here are our current pricing rates.";
-  }
-  
-  return "I'll search for that information for you.";
-}
-
-function generateActionMessage(message: string): string {
-  if (message.includes('ship') || message.includes('send')) {
-    return "I can help you create a new shipment. Please visit the shipping page to fill out the details.";
-  }
-  
-  return "I'll help you with that action.";
-}
-
-function generateFriendlyMessage(category: string, results: any[]): string {
-  switch (category) {
-    case 'search':
-      if (results.length === 0) {
-        return "I couldn't find any matching information. Please try a different search term.";
-      }
-      return `I found ${results.length} result(s) for you.`;
-      
-    case 'action':
-      return "Action completed successfully!";
-      
-    default:
-      return "Here's the information you requested.";
-  }
+  return response.choices[0].message.content || 'I found some results for you.';
 }
 
 export default router; 

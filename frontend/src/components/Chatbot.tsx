@@ -67,7 +67,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onToggle }) => {
         // Direct conversation response
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
-          text: response,
+          text: message || response, // Use message field from LLM, fallback to response
           sender: 'bot',
           timestamp: new Date()
         };
@@ -112,7 +112,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onToggle }) => {
 
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
-          text: `${resultMessage}\n\n${formattedResults}`,
+          text: resultMessage, // Use LLM-generated message directly
           sender: 'bot',
           timestamp: new Date(),
           data: results,
