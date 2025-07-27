@@ -1,11 +1,64 @@
 import express from 'express';
 import { sequelize, QueryTypes } from '../config/database';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
 
 const router = express.Router();
 
-// Database schema for the AI to understand
-const DATABASE_SCHEMA = `
+// Read database schema from init.sql file
+function getDatabaseSchema(): string {
+  try {
+    const schemaPath = path.join(__dirname, '../../database/init.sql');
+    const schemaContent = fs.readFileSync(schemaPath, 'utf8');
+    
+    // Parse the SQL file to extract table structures
+    const lines = schemaContent.split('\n');
+    let schemaDescription = 'Database Schema:\n';
+    let currentTable = '';
+    let currentColumns: string[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Check for CREATE TABLE statements
+      if (line.startsWith('CREATE TABLE')) {
+        // Save previous table if exists
+        if (currentTable && currentColumns.length > 0) {
+          schemaDescription += `- ${currentTable}: ${currentColumns.join(', ')}\n`;
+        }
+        
+        // Start new table
+        const tableMatch = line.match(/CREATE TABLE (\w+)/);
+        if (tableMatch) {
+          currentTable = tableMatch[1];
+          currentColumns = [];
+        }
+      }
+      
+      // Check for column definitions (lines that start with a word and contain a data type)
+      if (currentTable && line && !line.startsWith('--') && !line.startsWith('CREATE') && !line.startsWith(')') && !line.startsWith('PRIMARY') && !line.startsWith('FOREIGN') && !line.startsWith('CHECK') && !line.startsWith('UNIQUE')) {
+        const columnMatch = line.match(/^(\w+)\s+([A-Z]+)/);
+        if (columnMatch) {
+          currentColumns.push(columnMatch[1]);
+        }
+      }
+      
+      // End of table definition
+      if (line === ');' && currentTable) {
+        if (currentColumns.length > 0) {
+          schemaDescription += `- ${currentTable}: ${currentColumns.join(', ')}\n`;
+        }
+        currentTable = '';
+        currentColumns = [];
+      }
+    }
+    
+    return schemaDescription;
+  } catch (error) {
+    console.error('Error reading database schema:', error);
+    // Fallback to basic schema if file can't be read
+    return `
 Database Schema:
 - users: id, uuid, email, first_name, last_name, phone, role, is_active, created_at, updated_at
 - packages: id, tracking_number, sender_name, recipient_name, origin, destination, status, weight, dimensions, total_cost, created_at, updated_at
@@ -13,6 +66,10 @@ Database Schema:
 - quotes: id, quote_number, customer_id, pickup_address_id, delivery_address_id, package_type, weight, dimensions, distance_miles, service_type, base_price, distance_price, weight_price, service_price, total_price, status, created_at
 - pricing_rules: id, rule_name, customer_type, package_type, service_type, base_rate, per_mile_rate, per_pound_rate, size_multiplier, min_charge, max_discount_percent
 `;
+  }
+}
+
+const DATABASE_SCHEMA = getDatabaseSchema();
 
 // Access control rules
 const ACCESS_RULES = `
@@ -175,21 +232,32 @@ function generateActionSQL(message: string, user: any): string {
 }
 
 function validateAndSanitizeSQL(sql: string, user: any): string | null {
-  // Basic SQL injection prevention
+  // Basic SQL injection prevention - only check for dangerous modification keywords
   const dangerousKeywords = ['DROP', 'DELETE', 'UPDATE', 'INSERT', 'CREATE', 'ALTER', 'TRUNCATE'];
-  const upperSql = sql.toUpperCase();
   
-  if (dangerousKeywords.some(keyword => upperSql.includes(keyword))) {
+  // Only check for dangerous keywords if they appear as standalone statements
+  if (dangerousKeywords.some(keyword => {
+    const pattern = new RegExp(`\\b${keyword}\\b`, 'i');
+    return pattern.test(sql);
+  })) {
     return null;
   }
   
   // Ensure user can only access their own data (unless admin)
   if (user?.role !== 'admin') {
-    if (sql.includes('users') && !sql.includes(`id = ${user?.id}`)) {
+    if (sql.toLowerCase().includes('users') && !sql.includes(`id = ${user?.id}`)) {
       return null;
     }
-    if (sql.includes('packages') && !sql.includes(`sender_name = '${user?.name || user?.email}'`)) {
-      return null;
+    if (sql.toLowerCase().includes('packages')) {
+      // Allow packages queries if they include user's name or email
+      const userIdentifier = user?.name || user?.email;
+      
+      if (!sql.includes(`sender_name = '${userIdentifier}'`) && 
+          !sql.includes(`sender_name='${userIdentifier}'`) &&
+          !sql.includes(`sender_name = "${userIdentifier}"`) &&
+          !sql.includes(`sender_name="${userIdentifier}"`)) {
+        return null;
+      }
     }
   }
   
