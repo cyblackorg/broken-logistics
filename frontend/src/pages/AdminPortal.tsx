@@ -3,6 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import PackageStatusManager from '../components/PackageStatusManager';
 import UserManagement from '../components/UserManagement';
+import AnalyticsDashboard from '../components/AnalyticsDashboard';
 
 // System statistics
 const systemStats = {
@@ -432,12 +433,7 @@ const AdminPortal: React.FC = () => {
         )}
 
         {/* Reports Tab */}
-        {activeTab === 'reports' && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Analytics & Reports</h2>
-            <p className="text-gray-600">Business intelligence and reporting dashboard would go here.</p>
-          </div>
-        )}
+        {activeTab === 'reports' && <AnalyticsDashboard />}
       </div>
     </div>
   );
