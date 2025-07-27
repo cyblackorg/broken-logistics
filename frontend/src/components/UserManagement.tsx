@@ -10,8 +10,6 @@ interface User {
   last_name: string;
   phone: string;
   role: string;
-  customer_type: string;
-  company_name: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -25,7 +23,6 @@ interface UserFormData {
   phone: string;
   role: string;
   customer_type: string;
-  company_name: string;
   is_active: boolean;
 }
 
@@ -47,7 +44,6 @@ const UserManagement: React.FC = () => {
     phone: '',
     role: 'customer',
     customer_type: 'individual',
-    company_name: '',
     is_active: true
   });
 
@@ -152,7 +148,6 @@ const UserManagement: React.FC = () => {
       phone: '',
       role: 'customer',
       customer_type: 'individual',
-      company_name: '',
       is_active: true
     });
     setSelectedUser(null);
@@ -168,7 +163,6 @@ const UserManagement: React.FC = () => {
       phone: user.phone || '',
       role: user.role,
       customer_type: user.customer_type,
-      company_name: user.company_name || '',
       is_active: user.is_active
     });
     setShowEditModal(true);

@@ -8,8 +8,6 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('customer');
-  const [customerType, setCustomerType] = useState('individual');
-  const [companyName, setCompanyName] = useState('');
   const { register, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -33,7 +31,7 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    const success = await register(name, email, password, role, customerType, companyName);
+    const success = await register(name, email, password, role);
     if (success) {
       navigate('/login');
     }
@@ -121,49 +119,7 @@ const RegisterPage: React.FC = () => {
               </select>
             </div>
 
-            {/* Customer Type Selection */}
-            {role === 'customer' && (
-              <>
-                <div>
-                  <label htmlFor="customerType" className="block text-sm font-medium text-gray-700">
-                    Customer Type
-                  </label>
-                  <select
-                    id="customerType"
-                    name="customerType"
-                    value={customerType}
-                    onChange={(e) => setCustomerType(e.target.value)}
-                    className="mt-1 relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="individual">Individual Customer</option>
-                    <option value="business">Business Customer</option>
-                  </select>
-                  <p className="mt-1 text-xs text-blue-600">
-                    💼 Business customers get automatic discounts!
-                  </p>
-                </div>
 
-                {customerType === 'business' && (
-                  <div>
-                    <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
-                      Company Name
-                    </label>
-                    <input
-                      id="companyName"
-                      name="companyName"
-                      type="text"
-                      className="mt-1 relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Your company name"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                    />
-                    <p className="mt-1 text-xs text-green-600">
-                      🎯 Business accounts get up to 25% discount and credit terms!
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
           </div>
 
           <div>

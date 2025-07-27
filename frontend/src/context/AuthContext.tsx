@@ -15,7 +15,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string, role?: string, customerType?: string, companyName?: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, role?: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function that connects to vulnerable backend
-  const register = async (name: string, email: string, password: string, role: string = 'customer', customerType: string = 'individual', companyName?: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, role: string = 'customer'): Promise<boolean> => {
     try {
       setLoading(true);
       
@@ -108,9 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         lastName,
         email,
         password,
-        role,
-        customerType,
-        companyName
+        role
       });
 
       if (response.data.success) {

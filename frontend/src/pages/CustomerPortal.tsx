@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-// Mock user data enhanced with business customer features
+// Mock user data
 const createMockUser = (user: any) => ({
   name: user?.name || "John Customer",
   email: user?.email || "john@example.com",
   id: user?.id || "12345",
-  accountTier: user?.customer_type === 'business' ? "Business Premium" : "Individual",
-  balance: user?.customer_type === 'business' ? "$15,432.18" : "$243.18",
-  customerType: user?.customer_type || 'individual',
-  companyName: (user as any)?.company_name || null
+  accountTier: "Individual",
+  balance: "$243.18"
 });
 
 const mockPackages = [
@@ -270,9 +268,6 @@ const CustomerPortal: React.FC = () => {
                   className="w-full flex items-center justify-center px-4 py-2 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100"
                 >
                   💰 Ship Package
-                  {mockUser.customerType === 'business' && (
-                    <span className="ml-1 text-xs">✨ Business Rates!</span>
-                  )}
                 </Link>
                 <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                   📊 View Analytics

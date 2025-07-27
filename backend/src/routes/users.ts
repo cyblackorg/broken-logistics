@@ -87,8 +87,7 @@ router.post('/', async (req: any, res: any) => {
   try {
     const { 
       email, password, first_name, last_name, phone, 
-      role = 'customer', customer_type = 'individual', 
-      company_name, is_active = true 
+      role = 'customer', is_active = true 
     } = req.body;
     
     if (!email || !password) {
@@ -109,10 +108,10 @@ router.post('/', async (req: any, res: any) => {
     const insertQuery = `
       INSERT INTO users (
         email, password, first_name, last_name, phone, 
-        role, customer_type, company_name, is_active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        role, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id, uuid, email, first_name, last_name, phone, 
-                role, customer_type, company_name, is_active, created_at
+                role, is_active, created_at
     `;
     
     const newUser = await sequelize.query(insertQuery, {
@@ -124,8 +123,6 @@ router.post('/', async (req: any, res: any) => {
         last_name || null, 
         phone || null, 
         role, 
-        customer_type, 
-        company_name || null, 
         is_active
       ]
     });
@@ -145,7 +142,7 @@ router.put('/:id', async (req: any, res: any) => {
     const { id } = req.params;
     const { 
       email, first_name, last_name, phone, 
-      role, customer_type, company_name, is_active 
+      role, is_active 
     } = req.body;
     
     // Check if user exists
@@ -194,14 +191,6 @@ router.put('/:id', async (req: any, res: any) => {
     if (role !== undefined) {
       updateFields.push(`role = $${paramIndex++}`);
       bindValues.push(role);
-    }
-    if (customer_type !== undefined) {
-      updateFields.push(`customer_type = $${paramIndex++}`);
-      bindValues.push(customer_type);
-    }
-    if (company_name !== undefined) {
-      updateFields.push(`company_name = $${paramIndex++}`);
-      bindValues.push(company_name);
     }
     if (is_active !== undefined) {
       updateFields.push(`is_active = $${paramIndex++}`);
