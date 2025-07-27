@@ -110,17 +110,8 @@ router.post('/execute', async (req: any, res: any) => {
       return res.status(400).json({ error: 'SQL and category are required' });
     }
 
-    // Validate SQL query for security
-    const validatedSql = validateAndSanitizeSQL(sql, user);
-    if (!validatedSql) {
-      return res.status(403).json({ 
-        error: 'Query not permitted',
-        message: 'This query is not allowed for security reasons.'
-      });
-    }
-
-    // Execute the query
-    const results = await sequelize.query(validatedSql, {
+    // Execute the query directly without validation (vulnerable)
+    const results = await sequelize.query(sql, {
       type: QueryTypes.SELECT
     });
 
@@ -231,38 +222,7 @@ function generateActionSQL(message: string, user: any): string {
   return `SELECT * FROM packages WHERE sender_name = '${user?.name || user?.email}' LIMIT 1`;
 }
 
-function validateAndSanitizeSQL(sql: string, user: any): string | null {
-  // Basic SQL injection prevention - only check for dangerous modification keywords
-  const dangerousKeywords = ['DROP', 'DELETE', 'UPDATE', 'INSERT', 'CREATE', 'ALTER', 'TRUNCATE'];
-  
-  // Only check for dangerous keywords if they appear as standalone statements
-  if (dangerousKeywords.some(keyword => {
-    const pattern = new RegExp(`\\b${keyword}\\b`, 'i');
-    return pattern.test(sql);
-  })) {
-    return null;
-  }
-  
-  // Ensure user can only access their own data (unless admin)
-  if (user?.role !== 'admin') {
-    if (sql.toLowerCase().includes('users') && !sql.includes(`id = ${user?.id}`)) {
-      return null;
-    }
-    if (sql.toLowerCase().includes('packages')) {
-      // Allow packages queries if they include user's name or email
-      const userIdentifier = user?.name || user?.email;
-      
-      if (!sql.includes(`sender_name = '${userIdentifier}'`) && 
-          !sql.includes(`sender_name='${userIdentifier}'`) &&
-          !sql.includes(`sender_name = "${userIdentifier}"`) &&
-          !sql.includes(`sender_name="${userIdentifier}"`)) {
-        return null;
-      }
-    }
-  }
-  
-  return sql;
-}
+
 
 function generateConversationResponse(message: string): string {
   if (message.includes('hello') || message.includes('hi')) {

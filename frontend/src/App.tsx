@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import Chatbot from './components/Chatbot';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,6 +16,8 @@ import ShippingPage from './pages/ShippingPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
+  const [chatbotOpen, setChatbotOpen] = useState(false);
+
   return (
     <AuthProvider>
       <Router>
@@ -29,7 +32,7 @@ function App() {
               <Route path="/shipping" element={<ShippingPage />} />
               
               {/* Protected Routes */}
-                            <Route path="/customer/*" element={
+              <Route path="/customer/*" element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <CustomerPortal />
                 </ProtectedRoute>
@@ -52,6 +55,13 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          
+          {/* Global Chatbot */}
+          <Chatbot 
+            isOpen={chatbotOpen} 
+            onClose={() => setChatbotOpen(false)} 
+            onToggle={() => setChatbotOpen(!chatbotOpen)}
+          />
         </div>
         <Toaster position="top-right" />
       </Router>
