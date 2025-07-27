@@ -176,7 +176,7 @@ const UserManagement: React.FC = () => {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-purple-100 text-purple-800';
-      case 'driver': return 'bg-blue-100 text-blue-800';
+
       case 'customer_service': return 'bg-orange-100 text-orange-800';
       default: return 'bg-green-100 text-green-800';
     }

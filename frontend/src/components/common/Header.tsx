@@ -71,8 +71,7 @@ const Header: React.FC = () => {
     switch (user.role) {
       case 'admin':
         return '/admin';
-      case 'driver':
-        return '/driver';
+
       case 'customer':
       default:
         return '/customer';

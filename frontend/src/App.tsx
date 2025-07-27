@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CustomerPortal from './pages/CustomerPortal';
-import DriverPortal from './pages/DriverPortal';
+
 import AdminPortal from './pages/AdminPortal';
 import TrackingPage from './pages/TrackingPage';
 import ShippingPage from './pages/ShippingPage';
@@ -35,11 +35,7 @@ function App() {
                 </ProtectedRoute>
               } />
               
-              <Route path="/driver/*" element={
-                <ProtectedRoute allowedRoles={['driver']}>
-                  <DriverPortal />
-                </ProtectedRoute>
-              } />
+
               
               <Route path="/admin/*" element={
                 <ProtectedRoute allowedRoles={['admin']}>

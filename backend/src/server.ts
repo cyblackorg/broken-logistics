@@ -10,7 +10,7 @@ import { logger } from './utils/logger';
 import authRoutes from './routes/auth';
 import packageRoutes from './routes/packages';
 import userRoutes from './routes/users';
-import driverRoutes from './routes/driver';
+
 import adminRoutes from './routes/admin';
 import trackingRoutes from './routes/tracking';
 import analyticsRoutes from './routes/analytics';
@@ -76,7 +76,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/packages', packageRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/driver', driverRoutes);
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/track', trackingRoutes);
 app.use('/api/analytics', analyticsRoutes);

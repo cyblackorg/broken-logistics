@@ -30,9 +30,7 @@ const LoginPage: React.FC = () => {
         case 'admin':
           navigate('/admin');
           break;
-        case 'driver':
-          navigate('/driver');
-          break;
+        
         case 'customer':
         default:
           navigate('/customer');
@@ -57,7 +55,7 @@ const LoginPage: React.FC = () => {
 
   const exampleCredentials = [
     { role: 'Customer', email: 'customer@brokenlogistics.com', password: 'customer123' },
-    { role: 'Driver', email: 'driver@brokenlogistics.com', password: 'driver123' },
+
     { role: 'Admin', email: 'admin@brokenlogistics.com', password: 'admin123' }
   ];
 

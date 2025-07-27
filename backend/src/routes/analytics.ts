@@ -12,7 +12,7 @@ router.get('/overview', async (req: any, res: any) => {
         COUNT(*) as total_users,
         COUNT(CASE WHEN is_active = true THEN 1 END) as active_users,
         COUNT(CASE WHEN role = 'customer' THEN 1 END) as customers,
-        COUNT(CASE WHEN role = 'driver' THEN 1 END) as drivers,
+
         COUNT(CASE WHEN role = 'admin' THEN 1 END) as admins
       FROM users`,
       { type: QueryTypes.SELECT }

@@ -87,27 +87,7 @@ const PackageStatusManager: React.FC<PackageStatusManagerProps> = ({
   const getAvailableStatusOptions = () => {
     if (userRole === 'admin') {
       return STATUS_OPTIONS; // Admins can set any status
-    } else if (userRole === 'driver') {
-      // Drivers have limited options based on current status
-      switch (currentStatus) {
-        case 'created':
-          return STATUS_OPTIONS.filter(s => ['dropped_off', 'picked_up', 'origin_depot'].includes(s.value));
-        case 'dropped_off':
-          return STATUS_OPTIONS.filter(s => ['picked_up', 'origin_depot'].includes(s.value));
-        case 'picked_up':
-          return STATUS_OPTIONS.filter(s => ['origin_depot', 'in_transit'].includes(s.value));
-        case 'origin_depot':
-          return STATUS_OPTIONS.filter(s => ['in_transit', 'destination_depot'].includes(s.value));
-        case 'in_transit':
-          return STATUS_OPTIONS.filter(s => ['destination_depot', 'out_for_delivery'].includes(s.value));
-        case 'destination_depot':
-          return STATUS_OPTIONS.filter(s => ['out_for_delivery', 'delivered'].includes(s.value));
-        case 'out_for_delivery':
-          return STATUS_OPTIONS.filter(s => ['delivered', 'exception'].includes(s.value));
-        default:
-          return STATUS_OPTIONS.filter(s => s.value === 'delivered');
-      }
-    }
+
     return [];
   };
 
@@ -118,7 +98,7 @@ const PackageStatusManager: React.FC<PackageStatusManagerProps> = ({
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         Update Package Status
         <span className="text-sm font-normal text-gray-500 ml-2">
-          ({userRole === 'admin' ? 'Admin' : 'Driver'} Access)
+          (Admin Access)
         </span>
       </h3>
 
@@ -167,7 +147,7 @@ const PackageStatusManager: React.FC<PackageStatusManagerProps> = ({
             {loading ? 'Updating...' : 'Update Status'}
           </button>
 
-          {userRole === 'driver' && status === 'delivered' && (
+
             <button
               onClick={handleDeliveryConfirmation}
               disabled={loading}

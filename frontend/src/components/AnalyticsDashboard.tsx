@@ -7,7 +7,7 @@ interface OverviewData {
     total_users: number;
     active_users: number;
     customers: number;
-    drivers: number;
+  
     admins: number;
   };
   packages: {

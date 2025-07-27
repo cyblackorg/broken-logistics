@@ -149,7 +149,7 @@ const AdminPortal: React.FC = () => {
                 { id: 'overview', name: 'Overview', desc: 'System Stats' },
                 { id: 'users', name: 'Users', desc: 'Manage Accounts' },
                 { id: 'packages', name: 'Packages', desc: 'Shipment Monitoring' },
-                { id: 'drivers', name: 'Drivers', desc: 'Fleet Management' },
+        
                 { id: 'reports', name: 'Reports', desc: 'Analytics' }
               ].map((tab) => (
                 <button
@@ -282,10 +282,7 @@ const AdminPortal: React.FC = () => {
                     <span className="text-sm text-gray-600">API Response Time</span>
                     <span className="text-sm text-green-600">142ms</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Active Drivers</span>
-                    <span className="text-sm text-gray-900">47</span>
-                  </div>
+
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Database Size</span>
                     <span className="text-sm text-gray-900">{systemStats.databaseSize}</span>
@@ -424,13 +421,7 @@ const AdminPortal: React.FC = () => {
           </div>
         )}
 
-        {/* Drivers Tab */}
-        {activeTab === 'drivers' && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Driver Management</h2>
-            <p className="text-gray-600">Driver fleet management interface would go here.</p>
-          </div>
-        )}
+
 
         {/* Reports Tab */}
         {activeTab === 'reports' && <AnalyticsDashboard />}

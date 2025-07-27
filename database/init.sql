@@ -217,7 +217,7 @@ CREATE INDEX idx_pricing_rules_type ON pricing_rules(customer_type, package_type
 -- Insert seed data for development
 INSERT INTO users (email, password, first_name, last_name, role, customer_type) VALUES
 ('admin@brokenlogistics.com', 'admin123', 'System', 'Administrator', 'admin', 'individual'),
-('driver@brokenlogistics.com', 'driver123', 'John', 'Driver', 'driver', 'individual'),
+
 ('customer@brokenlogistics.com', 'customer123', 'Jane', 'Customer', 'customer', 'individual'),
 ('support@brokenlogistics.com', 'support123', 'Sarah', 'Support', 'customer_service', 'individual');
 
