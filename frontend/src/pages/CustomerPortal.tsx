@@ -66,7 +66,7 @@ const CustomerPortal: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link
-                  to="/ship"
+                  to="/shipping"
                   className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -101,7 +101,7 @@ const CustomerPortal: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
-                  to="/ship"
+                  to="/shipping"
                   className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
                 >
                   📦 Ship New Package

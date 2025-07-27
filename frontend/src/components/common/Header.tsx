@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Chatbot from '../Chatbot';
 
 // Icons with fixed sizing
 const MenuIcon = () => (
@@ -58,6 +59,7 @@ const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -119,6 +121,18 @@ const Header: React.FC = () => {
 
           {/* User Menu / Auth */}
           <div className="hidden lg:flex items-center space-x-4">
+            {isAuthenticated && (
+              <button
+                onClick={() => setChatbotOpen(!chatbotOpen)}
+                className="text-white hover:text-blue-200 transition-colors p-2"
+                title="AI Assistant"
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </button>
+            )}
+            
             {isAuthenticated ? (
               <>
                 <Link
@@ -248,6 +262,9 @@ const Header: React.FC = () => {
           </div>
         </div>
       )}
+      
+      {/* Chatbot */}
+      <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
     </header>
   );
 };
