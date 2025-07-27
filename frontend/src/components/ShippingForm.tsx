@@ -68,9 +68,9 @@ const ShippingForm: React.FC = () => {
     const loadData = async () => {
       try {
         const [statesRes, sizesRes, speedsRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/quotes/states`),
-          axios.get(`${API_BASE_URL}/quotes/package-sizes`),
-          axios.get(`${API_BASE_URL}/quotes/speed-options`)
+          axios.get(`${API_BASE_URL}/shipping/states`),
+          axios.get(`${API_BASE_URL}/shipping/package-sizes`),
+          axios.get(`${API_BASE_URL}/shipping/speed-options`)
         ]);
 
         setStates(statesRes.data.states);
@@ -94,7 +94,7 @@ const ShippingForm: React.FC = () => {
 
   const calculateQuote = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/quotes/calculate`, {
+      const response = await axios.post(`${API_BASE_URL}/shipping/calculate`, {
         originState: formData.originState,
         destinationState: formData.destinationState,
         packageSize: formData.packageSize,

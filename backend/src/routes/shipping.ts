@@ -1,9 +1,135 @@
 import express from 'express';
 import { sequelize, QueryTypes } from '../config/database';
-import { calculateShippingCost } from '../utils/pricing';
+import { calculateShippingCost, getAvailableStates, getPackageSizes, getSpeedOptions } from '../utils/pricing';
 import { logger } from '../utils/logger';
 
 const router = express.Router();
+
+// ===== STATIC ROUTES (MUST COME FIRST) =====
+
+/**
+ * @swagger
+ * /api/shipping/states:
+ *   get:
+ *     summary: Get available states
+ *     tags: [Shipping]
+ */
+router.get('/states', async (req: any, res: any) => {
+  try {
+    const states = getAvailableStates();
+    res.json({
+      success: true,
+      states
+    });
+  } catch (error: any) {
+    logger.error('States fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch states'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/shipping/package-sizes:
+ *   get:
+ *     summary: Get package size options
+ *     tags: [Shipping]
+ */
+router.get('/package-sizes', async (req: any, res: any) => {
+  try {
+    const packageSizes = getPackageSizes();
+    res.json({
+      success: true,
+      packageSizes
+    });
+  } catch (error: any) {
+    logger.error('Package sizes fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch package sizes'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/shipping/speed-options:
+ *   get:
+ *     summary: Get speed options
+ *     tags: [Shipping]
+ */
+router.get('/speed-options', async (req: any, res: any) => {
+  try {
+    const speedOptions = getSpeedOptions();
+    res.json({
+      success: true,
+      speedOptions
+    });
+  } catch (error: any) {
+    logger.error('Speed options fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch speed options'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/shipping/calculate:
+ *   post:
+ *     summary: Calculate shipping cost
+ *     tags: [Shipping]
+ */
+router.post('/calculate', async (req: any, res: any) => {
+  try {
+    const {
+      originState,
+      destinationState,
+      packageSize,
+      weight,
+      speed
+    } = req.body;
+
+    // Validate required fields
+    if (!originState || !destinationState || !packageSize || !weight || !speed) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        required: ['originState', 'destinationState', 'packageSize', 'weight', 'speed']
+      });
+    }
+
+    // Calculate shipping cost
+    const quote = calculateShippingCost(originState, destinationState, packageSize, weight, speed);
+
+    logger.info('QUOTE_CALCULATED', {
+      origin: originState,
+      destination: destinationState,
+      packageSize,
+      weight,
+      speed,
+      totalCost: quote.totalCost
+    });
+
+    res.json({
+      success: true,
+      quote: {
+        ...quote,
+        originState,
+        destinationState,
+        packageSize,
+        weight,
+        speed
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('Quote calculation error:', error);
+    res.status(400).json({
+      error: 'Failed to calculate quote',
+      message: error.message
+    });
+  }
+});
 
 /**
  * @swagger
@@ -117,6 +243,188 @@ router.post('/create', async (req: any, res: any) => {
 
 /**
  * @swagger
+ * /api/shipping/user/{userId}:
+ *   get:
+ *     summary: Get user's shipments
+ *     tags: [Shipping]
+ */
+router.get('/user/:userId', async (req: any, res: any) => {
+  try {
+    const { userId } = req.params;
+
+    // Get user's shipments
+    const shipmentsQuery = `
+      SELECT * FROM packages 
+      WHERE sender_id = ${userId}
+      ORDER BY created_at DESC
+    `;
+    const shipments = await sequelize.query(shipmentsQuery, {
+      type: QueryTypes.SELECT
+    });
+
+    res.json({
+      success: true,
+      shipments: shipments.map((shipment: any) => ({
+        id: shipment.id,
+        trackingNumber: shipment.tracking_number,
+        status: shipment.status,
+        recipientName: shipment.recipient_name,
+        destination: shipment.destination_state,
+        totalCost: shipment.total_cost,
+        estimatedDays: shipment.estimated_days,
+        createdAt: shipment.created_at,
+        estimatedDelivery: shipment.estimated_delivery
+      }))
+    });
+
+  } catch (error: any) {
+    logger.error('User shipments fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch user shipments',
+      message: error.message
+    });
+  }
+});
+
+// ===== DYNAMIC ROUTES (MUST COME LAST) =====
+
+/**
+ * @swagger
+ * /api/shipping/{trackingNumber}/confirm-delivery:
+ *   post:
+ *     summary: Confirm delivery (for drivers)
+ *     tags: [Shipping]
+ */
+router.post('/:trackingNumber/confirm-delivery', async (req: any, res: any) => {
+  try {
+    const { trackingNumber } = req.params;
+    const { signature, notes } = req.body;
+
+    // Get shipment
+    const shipmentQuery = `SELECT * FROM packages WHERE tracking_number = '${trackingNumber}'`;
+    const shipments = await sequelize.query(shipmentQuery, {
+      type: QueryTypes.SELECT
+    });
+
+    if (shipments.length === 0) {
+      return res.status(404).json({
+        error: 'Shipment not found'
+      });
+    }
+
+    const shipment = shipments[0] as any;
+
+    // Update to delivered status
+    const updateQuery = `
+      UPDATE packages 
+      SET status = 'delivered', delivered_at = NOW(), signature = '${signature || 'N/A'}', delivery_notes = '${notes || ''}'
+      WHERE tracking_number = '${trackingNumber}'
+    `;
+    await sequelize.query(updateQuery, {
+      type: QueryTypes.UPDATE
+    });
+
+    // Add delivery event
+    const eventQuery = `
+      INSERT INTO package_events (package_id, event_type, event_description, location, timestamp)
+      VALUES (${shipment.id}, 'delivered', 'Package delivered successfully', '${shipment.destination_state}', NOW())
+    `;
+    await sequelize.query(eventQuery);
+
+    logger.info('DELIVERY_CONFIRMED', {
+      trackingNumber,
+      signature,
+      notes
+    });
+
+    res.json({
+      success: true,
+      message: 'Delivery confirmed successfully',
+      deliveredAt: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    logger.error('Delivery confirmation error:', error);
+    res.status(500).json({
+      error: 'Failed to confirm delivery',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/shipping/{trackingNumber}/update-status:
+ *   post:
+ *     summary: Update package status and location
+ *     tags: [Shipping]
+ */
+router.post('/:trackingNumber/update-status', async (req: any, res: any) => {
+  try {
+    const { trackingNumber } = req.params;
+    const { status, description } = req.body;
+
+    // Validate required fields
+    if (!status) {
+      return res.status(400).json({
+        error: 'Status is required'
+      });
+    }
+
+    // Get shipment
+    const shipmentQuery = `SELECT * FROM packages WHERE tracking_number = '${trackingNumber}'`;
+    const shipments = await sequelize.query(shipmentQuery, {
+      type: QueryTypes.SELECT
+    });
+
+    if (shipments.length === 0) {
+      return res.status(404).json({
+        error: 'Shipment not found'
+      });
+    }
+
+    const shipment = shipments[0] as any;
+
+    // Update package status
+    const updateQuery = `
+      UPDATE packages 
+      SET status = '${status}', updated_at = NOW()
+      WHERE tracking_number = '${trackingNumber}'
+    `;
+    await sequelize.query(updateQuery, {
+      type: QueryTypes.UPDATE
+    });
+
+    // Add status update event
+    const eventQuery = `
+      INSERT INTO package_events (package_id, event_type, event_description, location, timestamp)
+      VALUES (${shipment.id}, '${status}', '${description || status.replace('_', ' ')}', '${shipment.destination_state}', NOW())
+    `;
+    await sequelize.query(eventQuery);
+
+    logger.info('STATUS_UPDATED', {
+      trackingNumber,
+      status,
+      description
+    });
+
+    res.json({
+      success: true,
+      message: 'Status updated successfully',
+      updatedAt: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    logger.error('Status update error:', error);
+    res.status(500).json({
+      error: 'Failed to update status',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/shipping/{trackingNumber}:
  *   get:
  *     summary: Get shipment details by tracking number
@@ -191,259 +499,6 @@ router.get('/:trackingNumber', async (req: any, res: any) => {
     logger.error('Shipment fetch error:', error);
     res.status(500).json({
       error: 'Failed to fetch shipment',
-      message: error.message
-    });
-  }
-});
-
-/**
- * @swagger
- * /api/shipping/{trackingNumber}/update-status:
- *   post:
- *     summary: Update shipment status (for drivers/admins)
- *     tags: [Shipping]
- */
-router.post('/:trackingNumber/update-status', async (req: any, res: any) => {
-  try {
-    const { trackingNumber } = req.params;
-    const { status, location, description } = req.body;
-
-    if (!status) {
-      return res.status(400).json({
-        error: 'Status is required'
-      });
-    }
-
-    // Get shipment
-    const shipmentQuery = `SELECT * FROM packages WHERE tracking_number = '${trackingNumber}'`;
-    const shipments = await sequelize.query(shipmentQuery, {
-      type: QueryTypes.SELECT
-    });
-
-    if (shipments.length === 0) {
-      return res.status(404).json({
-        error: 'Shipment not found'
-      });
-    }
-
-    const shipment = shipments[0] as any;
-
-    // Update status
-    const updateQuery = `
-      UPDATE packages 
-      SET status = '${status}', updated_at = NOW() 
-      WHERE tracking_number = '${trackingNumber}'
-    `;
-    await sequelize.query(updateQuery, {
-      type: QueryTypes.UPDATE
-    });
-
-    // Add tracking event
-    const eventQuery = `
-      INSERT INTO package_events (package_id, event_type, event_description, location, timestamp)
-      VALUES (${shipment.id}, '${status}', '${description || status}', '${location || 'Unknown'}', NOW())
-    `;
-    await sequelize.query(eventQuery);
-
-    logger.info('SHIPMENT_STATUS_UPDATED', {
-      trackingNumber,
-      status,
-      location,
-      description
-    });
-
-    res.json({
-      success: true,
-      message: 'Status updated successfully',
-      status,
-      location,
-      description
-    });
-
-  } catch (error: any) {
-    logger.error('Status update error:', error);
-    res.status(500).json({
-      error: 'Failed to update status',
-      message: error.message
-    });
-  }
-});
-
-/**
- * @swagger
- * /api/shipping/{trackingNumber}/confirm-delivery:
- *   post:
- *     summary: Confirm delivery (for drivers)
- *     tags: [Shipping]
- */
-router.post('/:trackingNumber/confirm-delivery', async (req: any, res: any) => {
-  try {
-    const { trackingNumber } = req.params;
-    const { signature, notes } = req.body;
-
-    // Get shipment
-    const shipmentQuery = `SELECT * FROM packages WHERE tracking_number = '${trackingNumber}'`;
-    const shipments = await sequelize.query(shipmentQuery, {
-      type: QueryTypes.SELECT
-    });
-
-    if (shipments.length === 0) {
-      return res.status(404).json({
-        error: 'Shipment not found'
-      });
-    }
-
-    const shipment = shipments[0] as any;
-
-    // Update to delivered status
-    const updateQuery = `
-      UPDATE packages 
-      SET status = 'delivered', delivered_at = NOW(), signature = '${signature || 'N/A'}', delivery_notes = '${notes || ''}'
-      WHERE tracking_number = '${trackingNumber}'
-    `;
-    await sequelize.query(updateQuery, {
-      type: QueryTypes.UPDATE
-    });
-
-    // Add delivery event
-    const eventQuery = `
-      INSERT INTO package_events (package_id, event_type, event_description, location, timestamp)
-      VALUES (${shipment.id}, 'delivered', 'Package delivered successfully', '${shipment.destination_state}', NOW())
-    `;
-    await sequelize.query(eventQuery);
-
-    logger.info('DELIVERY_CONFIRMED', {
-      trackingNumber,
-      signature,
-      notes
-    });
-
-    res.json({
-      success: true,
-      message: 'Delivery confirmed successfully',
-      deliveredAt: new Date().toISOString()
-    });
-
-  } catch (error: any) {
-    logger.error('Delivery confirmation error:', error);
-    res.status(500).json({
-      error: 'Failed to confirm delivery',
-      message: error.message
-    });
-  }
-});
-
-/**
- * @swagger
- * /api/shipping/user/{userId}:
- *   get:
- *     summary: Get user's shipments
- *     tags: [Shipping]
- */
-router.get('/user/:userId', async (req: any, res: any) => {
-  try {
-    const { userId } = req.params;
-
-    // Get user's shipments
-    const shipmentsQuery = `
-      SELECT * FROM packages 
-      WHERE sender_id = ${userId}
-      ORDER BY created_at DESC
-    `;
-    const shipments = await sequelize.query(shipmentsQuery, {
-      type: QueryTypes.SELECT
-    });
-
-    res.json({
-      success: true,
-      shipments: shipments.map((shipment: any) => ({
-        id: shipment.id,
-        trackingNumber: shipment.tracking_number,
-        status: shipment.status,
-        recipientName: shipment.recipient_name,
-        destination: shipment.destination_state,
-        totalCost: shipment.total_cost,
-        estimatedDays: shipment.estimated_days,
-        createdAt: shipment.created_at,
-        estimatedDelivery: shipment.estimated_delivery
-      }))
-    });
-
-  } catch (error: any) {
-    logger.error('User shipments fetch error:', error);
-    res.status(500).json({
-      error: 'Failed to fetch user shipments',
-      message: error.message
-    });
-  }
-});
-
-/**
- * @swagger
- * /api/shipping/{trackingNumber}/update-status:
- *   post:
- *     summary: Update package status and location
- *     tags: [Shipping]
- */
-router.post('/:trackingNumber/update-status', async (req: any, res: any) => {
-  try {
-    const { trackingNumber } = req.params;
-    const { status, description } = req.body;
-
-    // Validate required fields
-    if (!status) {
-      return res.status(400).json({
-        error: 'Status is required'
-      });
-    }
-
-    // Get shipment
-    const shipmentQuery = `SELECT * FROM packages WHERE tracking_number = '${trackingNumber}'`;
-    const shipments = await sequelize.query(shipmentQuery, {
-      type: QueryTypes.SELECT
-    });
-
-    if (shipments.length === 0) {
-      return res.status(404).json({
-        error: 'Shipment not found'
-      });
-    }
-
-    const shipment = shipments[0] as any;
-
-    // Update package status
-    const updateQuery = `
-      UPDATE packages 
-      SET status = '${status}', updated_at = NOW()
-      WHERE tracking_number = '${trackingNumber}'
-    `;
-    await sequelize.query(updateQuery, {
-      type: QueryTypes.UPDATE
-    });
-
-    // Add status update event
-    const eventQuery = `
-      INSERT INTO package_events (package_id, event_type, event_description, location, timestamp)
-      VALUES (${shipment.id}, '${status}', '${description || status.replace('_', ' ')}', '${shipment.destination_state}', NOW())
-    `;
-    await sequelize.query(eventQuery);
-
-    logger.info('STATUS_UPDATED', {
-      trackingNumber,
-      status,
-      description
-    });
-
-    res.json({
-      success: true,
-      message: 'Status updated successfully',
-      updatedAt: new Date().toISOString()
-    });
-
-  } catch (error: any) {
-    logger.error('Status update error:', error);
-    res.status(500).json({
-      error: 'Failed to update status',
       message: error.message
     });
   }

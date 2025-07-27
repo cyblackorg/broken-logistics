@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import QuoteManager from '../components/QuoteManager';
 import { useAuth } from '../context/AuthContext';
 
 // Mock user data enhanced with business customer features
@@ -77,7 +76,6 @@ const mockActivity = [
 const CustomerPortal: React.FC = () => {
   const { user } = useAuth();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-  const [showQuoteManager, setShowQuoteManager] = useState(false);
   
   // Create mock user with business customer enhancements
   const mockUser = createMockUser(user);
@@ -114,13 +112,8 @@ const CustomerPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Conditional Content */}
-      {showQuoteManager ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <QuoteManager />
-        </div>
-      ) : (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -272,15 +265,15 @@ const CustomerPortal: React.FC = () => {
                 >
                   🔍 Track Packages
                 </Link>
-                <button 
-                  onClick={() => setShowQuoteManager(!showQuoteManager)}
+                <Link
+                  to="/shipping"
                   className="w-full flex items-center justify-center px-4 py-2 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100"
                 >
-                  💰 {showQuoteManager ? 'Hide Quotes' : 'Get Quote'}
+                  💰 Ship Package
                   {mockUser.customerType === 'business' && (
                     <span className="ml-1 text-xs">✨ Business Rates!</span>
                   )}
-                </button>
+                </Link>
                 <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                   📊 View Analytics
                 </button>
@@ -333,8 +326,7 @@ const CustomerPortal: React.FC = () => {
             </div>
           </div>
         </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
