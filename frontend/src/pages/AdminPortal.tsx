@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import PackageStatusManager from '../components/PackageStatusManager';
+import UserManagement from '../components/UserManagement';
 
 // System statistics
 const systemStats = {
@@ -13,49 +14,7 @@ const systemStats = {
   serverUptime: "99.2%"
 };
 
-// User management data
-const mockUsers = [
-  {
-    id: "1",
-    name: "John Customer",
-    email: "john@example.com",
-    role: "Customer",
-    status: "Active",
-    lastLogin: "2 hours ago",
-    joinDate: "Mar 15, 2024",
-    totalPackages: 23
-  },
-  {
-    id: "2", 
-    name: "Mike Driver",
-    email: "mike@brokenlogistics.com",
-    role: "Driver",
-    status: "Active",
-    lastLogin: "1 hour ago",
-    joinDate: "Jan 10, 2024",
-    totalDeliveries: 1247
-  },
-  {
-    id: "3",
-    name: "Sarah Wilson",
-    email: "sarah@company.com", 
-    role: "Customer",
-    status: "Inactive",
-    lastLogin: "3 days ago",
-    joinDate: "Feb 22, 2024",
-    totalPackages: 8
-  },
-  {
-    id: "4",
-    name: "Admin User",
-    email: "admin@brokenlogistics.com", 
-    role: "Admin",
-    status: "Active",
-    lastLogin: "Just now",
-    joinDate: "Jan 1, 2024",
-    totalPackages: 0
-  }
-];
+
 
 // Package data for admin overview
 const mockPackages = [
@@ -337,79 +296,7 @@ const AdminPortal: React.FC = () => {
         )}
 
         {/* Users Tab */}
-        {activeTab === 'users' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border">
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
-                <div className="flex space-x-3">
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-md"
-                  />
-                  <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                    Add User
-                  </button>
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {mockUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.role === 'Admin' ? 'bg-purple-100 text-purple-800' :
-                            user.role === 'Driver' ? 'bg-blue-100 text-blue-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.lastLogin}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.role === 'Driver' ? `${user.totalDeliveries} deliveries` : `${user.totalPackages} packages`}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                          <button className="text-blue-600 hover:text-blue-800">View</button>
-                          <button className="text-yellow-600 hover:text-yellow-800">Edit</button>
-                          <button className="text-red-600 hover:text-red-800">Suspend</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'users' && <UserManagement />}
 
         {/* Packages Tab */}
         {activeTab === 'packages' && (
