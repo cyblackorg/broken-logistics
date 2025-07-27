@@ -87,7 +87,7 @@ const PackageStatusManager: React.FC<PackageStatusManagerProps> = ({
   const getAvailableStatusOptions = () => {
     if (userRole === 'admin') {
       return STATUS_OPTIONS; // Admins can set any status
-
+    }
     return [];
   };
 
@@ -148,14 +148,7 @@ const PackageStatusManager: React.FC<PackageStatusManagerProps> = ({
           </button>
 
 
-            <button
-              onClick={handleDeliveryConfirmation}
-              disabled={loading}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
-            >
-              {loading ? 'Confirming...' : 'Confirm Delivery'}
-            </button>
-          )}
+
         </div>
 
         {/* Current Status Display */}
