@@ -42,7 +42,8 @@ export default defineConfig({
   },
   define: {
     // Intentionally expose environment variables (vulnerable)
-    __API_URL__: JSON.stringify(process.env.REACT_APP_API_URL || 'http://localhost:5000'),
+    // __API_URL__: JSON.stringify(process.env.REACT_APP_API_URL || 'http://localhost:5000'),
+    __API_URL__: JSON.stringify(process.env.REACT_APP_API_URL || 'http://logistics.fezzant.com:5000'),
     __DEBUG__: JSON.stringify(process.env.NODE_ENV === 'development'),
     __VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0')
   },
