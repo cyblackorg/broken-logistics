@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import PaymentForm from './PaymentForm';
 import SavedCards from './SavedCards';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://logistics.fezzant.com:5000/api';
 
 interface State {
   code: string;

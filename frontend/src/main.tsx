@@ -6,7 +6,8 @@ import './index.css';
 // Vulnerable: Expose application configuration in global scope
 (window as any).__BROKEN_LOGISTICS__ = {
   version: '1.0.0',
-  api: 'http://localhost:5000',
+  // api: 'http://localhost:5000',
+  api: 'http://logistics.fezzant.com:5000',
   debug: true,
   vulnerabilities: {
     xss: true,
@@ -18,7 +19,8 @@ import './index.css';
 // Vulnerable: Console logging sensitive information
 console.log('🚀 BrokenLogistics Frontend Starting...');
 console.log('⚠️  SECURITY WARNING: This application contains intentional vulnerabilities');
-console.log('🔧 API Endpoint:', 'http://localhost:5000');
+// console.log('🔧 API Endpoint:', 'http://localhost:5000');
+console.log('🔧 API Endpoint:', 'http://logistics.fezzant.com:5000');
 console.log('🔑 Debug Mode:', true);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

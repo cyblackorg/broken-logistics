@@ -143,8 +143,10 @@ async function startServer() {
     // Start server
     app.listen(PORT, () => {
       logger.info(`🚀 BrokenLogistics API Server started on port ${PORT}`);
-      logger.info(`📖 Health Check: http://localhost:${PORT}/health`);
-      logger.info(`🔧 Debug Endpoint: http://localhost:${PORT}/debug`);
+      // logger.info(`📖 Health Check: http://localhost:${PORT}/health`);
+      // logger.info(`🔧 Debug Endpoint: http://localhost:${PORT}/debug`);
+      logger.info(`📖 Health Check: http://logistics.fezzant.com:${PORT}/health`);
+      logger.info(`🔧 Debug Endpoint: http://logistics.fezzant.com:${PORT}/debug`);
       logger.warn('⚠️  SECURITY WARNING: This server contains intentional vulnerabilities');
     });
 
