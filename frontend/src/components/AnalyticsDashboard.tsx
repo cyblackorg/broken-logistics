@@ -86,7 +86,8 @@ const AnalyticsDashboard: React.FC = () => {
   const loadOverviewData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/analytics/overview');
+      // const response = await axios.get('http://localhost:5000/api/analytics/overview');
+      const response = await axios.get('http://logistics.fezzant.com:5000/api/analytics/overview');
       setOverviewData(response.data);
     } catch (error) {
       console.error('Failed to load overview data:', error);
@@ -99,7 +100,8 @@ const AnalyticsDashboard: React.FC = () => {
   const loadRevenueData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/analytics/revenue?period=${period}`);
+      // const response = await axios.get(`http://localhost:5000/api/analytics/revenue?period=${period}`);
+      const response = await axios.get(`http://logistics.fezzant.com:5000/api/analytics/revenue?period=${period}`);
       setRevenueData(response.data);
     } catch (error) {
       console.error('Failed to load revenue data:', error);
@@ -112,7 +114,8 @@ const AnalyticsDashboard: React.FC = () => {
   const loadPackageData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/analytics/packages?period=${period}`);
+      // const response = await axios.get(`http://localhost:5000/api/analytics/packages?period=${period}`);
+      const response = await axios.get(`http://logistics.fezzant.com:5000/api/analytics/packages?period=${period}`);
       setPackageData(response.data);
     } catch (error) {
       console.error('Failed to load package data:', error);
@@ -125,7 +128,8 @@ const AnalyticsDashboard: React.FC = () => {
   const loadPerformanceData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/analytics/performance');
+      // const response = await axios.get('http://localhost:5000/api/analytics/performance');
+      const response = await axios.get('http://logistics.fezzant.com:5000/api/analytics/performance');
       setPerformanceData(response.data);
     } catch (error) {
       console.error('Failed to load performance data:', error);

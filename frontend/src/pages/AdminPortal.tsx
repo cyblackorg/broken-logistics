@@ -71,7 +71,8 @@ const AdminPortal: React.FC = () => {
   const loadPackages = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/packages');
+      // const response = await axios.get('http://localhost:5000/api/packages');
+      const response = await axios.get('http://logistics.fezzant.com:5000/api/packages');
       setPackages(response.data.packages || []);
     } catch (error) {
       console.error('Failed to load packages:', error);

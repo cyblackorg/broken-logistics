@@ -55,7 +55,8 @@ const UserManagement: React.FC = () => {
         ...(roleFilter && { role: roleFilter })
       });
 
-      const response = await axios.get(`http://localhost:5000/api/users?${params}`);
+      // const response = await axios.get(`http://localhost:5000/api/users?${params}`);
+      const response = await axios.get(`http://logistics.fezzant.com:5000/api/users?${params}`);
       setUsers(response.data.users || []);
       setTotalPages(response.data.pagination?.pages || 1);
     } catch (error) {
@@ -73,7 +74,8 @@ const UserManagement: React.FC = () => {
 
   const handleCreateUser = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/users', formData);
+      // const response = await axios.post('http://localhost:5000/api/users', formData);
+      const response = await axios.post('http://logistics.fezzant.com:5000/api/users', formData);
       toast.success('User created successfully');
       setShowCreateModal(false);
       resetForm();
@@ -91,7 +93,8 @@ const UserManagement: React.FC = () => {
       const updateData = { ...formData };
       delete updateData.password; // Don't send password in update
       
-      const response = await axios.put(`http://localhost:5000/api/users/${selectedUser.id}`, updateData);
+      // const response = await axios.put(`http://localhost:5000/api/users/${selectedUser.id}`, updateData);
+      const response = await axios.put(`http://logistics.fezzant.com:5000/api/users/${selectedUser.id}`, updateData);
       toast.success('User updated successfully');
       setShowEditModal(false);
       resetForm();
@@ -106,7 +109,8 @@ const UserManagement: React.FC = () => {
     if (!confirm('Are you sure you want to delete this user?')) return;
     
     try {
-      await axios.delete(`http://localhost:5000/api/users/${userId}`);
+      // await axios.delete(`http://localhost:5000/api/users/${userId}`);
+      await axios.delete(`http://logistics.fezzant.com:5000/api/users/${userId}`);
       toast.success('User deleted successfully');
       loadUsers();
     } catch (error: any) {
@@ -117,7 +121,8 @@ const UserManagement: React.FC = () => {
 
   const handleActivateUser = async (userId: number) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/${userId}/activate`);
+      // await axios.patch(`http://localhost:5000/api/users/${userId}/activate`);
+      await axios.patch(`http://logistics.fezzant.com:5000/api/users/${userId}/activate`);
       toast.success('User activated successfully');
       loadUsers();
     } catch (error: any) {
@@ -128,7 +133,8 @@ const UserManagement: React.FC = () => {
 
   const handleDeactivateUser = async (userId: number) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/${userId}/deactivate`);
+      // await axios.patch(`http://localhost:5000/api/users/${userId}/deactivate`);
+      await axios.patch(`http://logistics.fezzant.com:5000/api/users/${userId}/deactivate`);
       toast.success('User deactivated successfully');
       loadUsers();
     } catch (error: any) {

@@ -4,7 +4,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Card, Button, Input, Badge } from '../components/ui';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://logistics.fezzant.com:5000';
 
 interface User {
   id: number;
