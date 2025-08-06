@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import PackageStatusManager from '../components/PackageStatusManager';
 import UserManagement from '../components/UserManagement';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import { API_BASE_URL } from '../config/api';
 
 // System statistics
 const systemStats = {
@@ -71,7 +72,7 @@ const AdminPortal: React.FC = () => {
   const loadPackages = async () => {
     try {
       setLoading(true);
-          const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`);
+          const response = await axios.get(`${API_BASE_URL}/packages`);
       setPackages(response.data.packages || []);
     } catch (error) {
       console.error('Failed to load packages:', error);

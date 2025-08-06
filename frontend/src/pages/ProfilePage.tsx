@@ -3,9 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Card, Button, Input, Badge } from '../components/ui';
-
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://logistics.fezzant.com:5000';
+import { API_BASE_URL } from '../config/api';
 
 interface User {
   id: number;
@@ -95,7 +93,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile`, {
+      const response = await axios.get(`${API_BASE_URL}/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -113,7 +111,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchPaymentMethods = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods`, {
+      const response = await axios.get(`${API_BASE_URL}/profile/payment-methods`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -126,7 +124,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses`, {
+      const response = await axios.get(`${API_BASE_URL}/profile/addresses`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -142,7 +140,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile`, profileForm, {
+      const response = await axios.put(`${API_BASE_URL}/profile`, profileForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -173,7 +171,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/change-password`, {
+      await axios.post(`${API_BASE_URL}/profile/change-password`, {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword
       }, {
@@ -200,7 +198,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods`, paymentForm, {
+      const response = await axios.post(`${API_BASE_URL}/profile/payment-methods`, paymentForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -228,7 +226,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses`, addressForm, {
+      const response = await axios.post(`${API_BASE_URL}/profile/addresses`, addressForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -255,7 +253,7 @@ const ProfilePage: React.FC = () => {
 
   const handleDeletePaymentMethod = async (id: string) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods/${id}`, {
+      await axios.delete(`${API_BASE_URL}/profile/payment-methods/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -270,7 +268,7 @@ const ProfilePage: React.FC = () => {
 
   const handleDeleteAddress = async (id: number) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses/${id}`, {
+      await axios.delete(`${API_BASE_URL}/profile/addresses/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

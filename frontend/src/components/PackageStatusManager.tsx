@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
-// const API_BASE_URL = 'http://localhost:5000/api';
-const API_BASE_URL = 'http://logistics.fezzant.com:5000/api';
+import { API_BASE_URL } from '../config/api';
 
 interface PackageStatusManagerProps {
   trackingNumber: string;

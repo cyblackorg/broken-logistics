@@ -4,9 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import PaymentForm from './PaymentForm';
 import SavedCards from './SavedCards';
-
-// const API_BASE_URL = 'http://localhost:5000/api';
-const API_BASE_URL = 'http://logistics.fezzant.com:5000/api';
+import { API_BASE_URL } from '../config/api';
 
 interface State {
   code: string;

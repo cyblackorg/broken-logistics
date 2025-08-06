@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ShippingForm from '../components/ShippingForm';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const ShippingPage: React.FC = () => {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ const ShippingPage: React.FC = () => {
   const loadUserShipments = async () => {
     try {
       setLoading(true);
-          const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shipping/user/${user?.id}`);
+          const response = await axios.get(`${API_BASE_URL}/shipping/user/${user?.id}`);
       setUserShipments(response.data.shipments);
     } catch (error) {
       console.error('Failed to load shipments:', error);
