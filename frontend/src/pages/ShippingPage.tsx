@@ -19,8 +19,7 @@ const ShippingPage: React.FC = () => {
   const loadUserShipments = async () => {
     try {
       setLoading(true);
-      // const response = await axios.get(`http://localhost:5000/api/shipping/user/${user?.id}`);
-      const response = await axios.get(`http://logistics.fezzant.com:5000/api/shipping/user/${user?.id}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/shipping/user/${user?.id}`);
       setUserShipments(response.data.shipments);
     } catch (error) {
       console.error('Failed to load shipments:', error);

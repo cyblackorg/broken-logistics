@@ -95,7 +95,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/profile`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -113,7 +113,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchPaymentMethods = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/profile/payment-methods`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -126,7 +126,7 @@ const ProfilePage: React.FC = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/profile/addresses`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -142,7 +142,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put(`${API_BASE_URL}/api/profile`, profileForm, {
+      const response = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile`, profileForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -173,7 +173,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      await axios.post(`${API_BASE_URL}/api/profile/change-password`, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/change-password`, {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword
       }, {
@@ -200,7 +200,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/profile/payment-methods`, paymentForm, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods`, paymentForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -228,7 +228,7 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/profile/addresses`, addressForm, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses`, addressForm, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -255,7 +255,7 @@ const ProfilePage: React.FC = () => {
 
   const handleDeletePaymentMethod = async (id: string) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/profile/payment-methods/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/payment-methods/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -270,7 +270,7 @@ const ProfilePage: React.FC = () => {
 
   const handleDeleteAddress = async (id: number) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/profile/addresses/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile/addresses/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -607,7 +607,7 @@ const ProfilePage: React.FC = () => {
                     <div key={address.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
                         <div className="flex items-center space-x-2 mb-2">
-                          <Badge variant="outline">{address.type}</Badge>
+                          <Badge variant="secondary">{address.type}</Badge>
                           {address.is_default && (
                             <Badge variant="success">Default</Badge>
                           )}

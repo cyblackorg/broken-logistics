@@ -42,6 +42,31 @@ This application helps students and security professionals learn about:
 - **Docker** and **Docker Compose** (recommended)
 - **Node.js 18+** (for local development only)
 - **Git**
+- **OpenAI API Key** (for AI chatbot functionality)
+
+### Environment Setup
+
+1. **Copy the example environment file:**
+```bash
+cp .env.example .env
+```
+
+2. **Configure your environment variables:**
+```bash
+# Edit .env file with your settings
+nano .env
+```
+
+**Required Environment Variables:**
+- `OPENAI_API_KEY` - Your OpenAI API key for the AI chatbot
+- `JWT_SECRET` - Secret key for JWT authentication (change from default)
+
+**Optional Environment Variables:**
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` - Database configuration
+- `PORT` - Backend server port (default: 5000)
+- `NODE_ENV` - Environment mode (development/production)
+- `REACT_APP_API_URL` - Frontend API URL
+- `OPENAI_MODEL`, `OPENAI_MAX_TOKENS`, `OPENAI_TEMPERATURE` - LLM configuration
 
 ### Option 1: Docker Compose (Recommended)
 

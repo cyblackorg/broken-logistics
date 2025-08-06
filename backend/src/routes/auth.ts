@@ -3,11 +3,12 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sequelize, QueryTypes } from '../config/database';
 import { logger, logSensitiveOperation } from '../utils/logger';
+import { APP_CONFIG } from '../config/environment';
 
 const router = express.Router();
 
 // Intentionally weak JWT secret and configuration
-const JWT_SECRET = process.env.JWT_SECRET || 'super_weak_secret_123';
+const JWT_SECRET = APP_CONFIG.jwtSecret;
 const JWT_EXPIRES_IN = '24h'; // Long expiration time
 
 /**

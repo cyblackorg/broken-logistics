@@ -4,9 +4,9 @@ import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import { sequelize } from './config/database';
 import { logger } from './utils/logger';
+import { APP_CONFIG, validateEnvironment } from './config/environment';
 import authRoutes from './routes/auth';
 import packageRoutes from './routes/packages';
 import userRoutes from './routes/users';
@@ -21,11 +21,7 @@ import profileRoutes from './routes/profile';
 import { errorHandler } from './middleware/errorHandler';
 import { vulnerabilityLogger } from './middleware/vulnerabilityLogger';
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Intentionally weak security configuration for educational purposes
 app.use(helmet({
@@ -63,12 +59,12 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
+    environment: APP_CONFIG.nodeEnv,
     version: '1.0.0',
     database: 'Connected',
     // Intentionally expose sensitive info
     secrets: {
-      jwtSecret: process.env.JWT_SECRET,
+      jwtSecret: APP_CONFIG.jwtSecret,
       dbUrl: process.env.DATABASE_URL
     }
   });
@@ -132,21 +128,24 @@ app.use(errorHandler);
 // Database connection and server startup
 async function startServer() {
   try {
+    // Validate environment configuration
+    validateEnvironment();
+    
     // Test database connection
     await sequelize.authenticate();
     logger.info('Database connection established successfully');
 
     // Sync database models (force: true recreates tables - dangerous in production)
-    await sequelize.sync({ force: process.env.NODE_ENV === 'development' });
+    await sequelize.sync({ force: APP_CONFIG.nodeEnv === 'development' });
     logger.info('Database synchronized');
 
     // Start server
-    app.listen(PORT, () => {
-      logger.info(`🚀 BrokenLogistics API Server started on port ${PORT}`);
-      // logger.info(`📖 Health Check: http://localhost:${PORT}/health`);
-      // logger.info(`🔧 Debug Endpoint: http://localhost:${PORT}/debug`);
-      logger.info(`📖 Health Check: http://logistics.fezzant.com:${PORT}/health`);
-      logger.info(`🔧 Debug Endpoint: http://logistics.fezzant.com:${PORT}/debug`);
+    app.listen(APP_CONFIG.port, () => {
+  logger.info(`🚀 BrokenLogistics API Server started on port ${APP_CONFIG.port}`);
+  // logger.info(`📖 Health Check: http://localhost:${APP_CONFIG.port}/health`);
+  // logger.info(`🔧 Debug Endpoint: http://localhost:${APP_CONFIG.port}/debug`);
+  logger.info(`📖 Health Check: http://logistics.fezzant.com:${APP_CONFIG.port}/health`);
+  logger.info(`🔧 Debug Endpoint: http://logistics.fezzant.com:${APP_CONFIG.port}/debug`);
       logger.warn('⚠️  SECURITY WARNING: This server contains intentional vulnerabilities');
     });
 

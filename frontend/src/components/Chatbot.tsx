@@ -56,8 +56,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onToggle }) => {
 
     try {
       // Step 1: Classify the query
-      // const classificationResponse = await axios.post('http://localhost:5000/api/chatbot/classify', {
-      const classificationResponse = await axios.post('http://logistics.fezzant.com:5000/api/chatbot/classify', {
+          const classificationResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chatbot/classify`, {
         message: inputMessage,
         user
       });
@@ -75,8 +74,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onToggle }) => {
         setMessages(prev => [...prev, botMessage]);
       } else if (type === 'search' || type === 'action') {
         // Execute SQL query
-        // const executionResponse = await axios.post('http://localhost:5000/api/chatbot/execute', {
-        const executionResponse = await axios.post('http://logistics.fezzant.com:5000/api/chatbot/execute', {
+            const executionResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chatbot/execute`, {
           sql,
           category,
           user

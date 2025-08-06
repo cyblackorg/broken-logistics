@@ -1,16 +1,14 @@
 import { Sequelize, QueryTypes } from 'sequelize';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { DB_CONFIG, APP_CONFIG } from './environment';
 
 // Intentionally expose database configuration for educational purposes
 const sequelize = new Sequelize(
-  process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/brokenlogistics',
+  DB_CONFIG.url,
   {
     logging: console.log, // Intentionally verbose logging
     dialect: 'postgres',
     dialectOptions: {
-      ssl: process.env.NODE_ENV === 'production' ? {
+      ssl: APP_CONFIG.nodeEnv === 'production' ? {
         require: true,
         rejectUnauthorized: false
       } : false

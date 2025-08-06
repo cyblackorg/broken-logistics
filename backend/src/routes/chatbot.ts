@@ -4,12 +4,13 @@ import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
+import { LLM_CONFIG } from '../config/environment';
 
 const router = express.Router();
 
-// Initialize OpenAI client
+// Initialize OpenAI client with environment configuration
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: LLM_CONFIG.apiKey,
 });
 
 // Read database schema from init.sql file
@@ -178,10 +179,10 @@ Examples:
 `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: LLM_CONFIG.model,
     messages: [{ role: "user", content: prompt }],
-    temperature: 0.1,
-    max_tokens: 500
+    temperature: LLM_CONFIG.temperature,
+    max_tokens: LLM_CONFIG.maxTokens
   });
 
   const content = response.choices[0].message.content;
@@ -208,9 +209,9 @@ If there are many results, summarize them appropriately.
 Keep the response concise but informative.`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: LLM_CONFIG.model,
     messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
+    temperature: 0.7, // Keep higher temperature for creative responses
     max_tokens: 300
   });
 

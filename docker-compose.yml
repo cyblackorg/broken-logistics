@@ -8,10 +8,11 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
-      #- REACT_APP_API_URL=http://localhost:5000
-      - REACT_APP_API_URL=http://logistics.fezzant.com:5000
-      - REACT_APP_ENV=development
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_ENV=${VITE_ENV}
     develop:
       watch:
         - action: sync
@@ -35,13 +36,18 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     ports:
-      - "5000:5000"
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:vulnerable_password@db:5432/brokenlogistics
-      - JWT_SECRET=super_weak_secret_123
-      - PORT=5000
+      - NODE_ENV=${NODE_ENV}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE}
     develop:
       watch:
         - action: sync
@@ -59,12 +65,14 @@ services:
   # PostgreSQL Database
   db:
     image: postgres:15
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=brokenlogistics
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=vulnerable_password
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -74,9 +82,11 @@ services:
   # pgAdmin for database management (optional)
   pgadmin:
     image: dpage/pgadmin4
+    env_file:
+      - .env
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@brokenlogistics.com
-      - PGADMIN_DEFAULT_PASSWORD=admin123
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
       - "8080:80"
     depends_on:
